@@ -1,0 +1,50 @@
+<!-- 公共顶栏 · H5响应式 · 修改此文件同步更新全站 -->
+<header class="header">
+  <div class="header-inner">
+    <!-- 汉堡菜单（仅移动端显示） -->
+    <button class="hamburger" id="hamburger" aria-label="菜单" onclick="document.getElementById('mobileNav').classList.toggle('show');document.getElementById('mobileOverlay').classList.toggle('show');this.classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+
+    <a href="index.html" class="logo">实习<span>通</span></a>
+
+    <form class="search-box" action="search.html" method="get">
+      <input type="search" name="q" placeholder="搜索岗位、公司、城市..." aria-label="搜索">
+      <button type="submit" class="search-icon" aria-label="搜索按钮">🔍</button>
+    </form>
+
+    <a href="publish.html" class="btn-post">📤 发布实习信息</a>
+
+    <!-- 未登录 -->
+    <a href="login.html" class="btn-login" id="header-login-btn">登录</a>
+
+    <!-- 已登录（默认隐藏，登录后显示） -->
+    <div id="header-user-area" style="display:none;align-items:center;gap:10px;white-space:nowrap;flex-wrap:nowrap">
+      <a href="notifications.html" id="header-notif-bell" style="position:relative;text-decoration:none;font-size:18px;display:none" title="通知">🔔<span id="notif-badge" style="position:absolute;top:-6px;right:-8px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 4px">0</span></a>
+      <a href="profile.html" id="header-avatar-link" style="text-decoration:none">
+        <span class="avatar" id="header-avatar" aria-label="个人主页" style="display:flex;align-items:center;justify-content:center">我</span>
+      </a>
+      <span id="header-username" style="font-size:13px;font-weight:600;color:#374151"></span>
+      <a href="#" onclick="Auth.logout();return false" style="font-size:12px;color:#9ca3af;text-decoration:none;margin-left:4px">退出</a>
+    </div>
+  </div>
+
+  <!-- 移动端遮罩 -->
+  <div class="mobile-overlay" id="mobileOverlay" onclick="document.getElementById('mobileNav').classList.remove('show');this.classList.remove('show');document.getElementById('hamburger').classList.remove('open')"></div>
+
+  <!-- 移动端抽屉导航 -->
+  <nav class="mobile-nav" id="mobileNav">
+    <div style="font-size:13px;color:#9ca3af;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px">导航菜单</div>
+    <a href="index.html">🏠 首页</a>
+    <a href="search.html">🔍 搜索实习</a>
+    <a href="publish.html">📤 发布实习信息</a>
+    <a href="profile.html">👤 个人主页</a>
+    <a href="login.html">🔑 登录 / 注册</a>
+    <hr style="border-color:#f3f4f6;margin:8px 0">
+    <a href="notifications.html">🔔 通知中心</a>
+    <a href="edit.html">⚙️ 修改信息</a>
+    <a href="bind-email.html">📧 绑定邮箱</a>
+    <a href="applications.html">📋 我的投递</a>
+    <a href="default.html">⭐ 我的收藏</a>
+  </nav>
+</header>

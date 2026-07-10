@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实习通 · 大学生实习互助平台</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== 公共顶栏（由 js/components.js 自动加载 components/header.html） ===== -->
+<div data-component="header"></div>
+
+<!-- ===== 主内容区 ===== -->
+<div class="main">
+
+  <!-- ===== 左侧：实习列表 ===== -->
+  <div class="content">
+
+    <!-- 口号横幅 -->
+    <div class="banner">
+      <div>🤝 同学们自发分享的实习信息，人人可发布、人人可受益</div>
+      <span>今日新增 <b>12</b> 条分享</span>
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+      <div class="filter-select">
+        <span class="filter-label">岗位类型</span>
+        <select id="idxJobType">
+          <option value="">全部岗位</option>
+          <option>技术开发</option><option>产品经理</option><option>UI/UX 设计</option>
+          <option>数据分析</option><option>运营</option><option>市场商务</option>
+          <option>金融投资</option><option>人力资源</option><option>财务会计</option><option>法务合规</option>
+        </select>
+      </div>
+      <div class="filter-select">
+        <span class="filter-label">工作城市</span>
+        <select id="idxCity">
+          <option value="">全部城市</option>
+          <option>北京</option><option>上海</option><option>广州</option><option>深圳</option>
+          <option>杭州</option><option>成都</option><option>南京</option><option>武汉</option>
+          <option>西安</option><option>苏州</option><option>远程办公</option>
+        </select>
+      </div>
+      <div class="filter-select">
+        <span class="filter-label">专业方向</span>
+        <select id="idxMajor">
+          <option value="">全部专业</option>
+          <option>计算机/软件</option><option>电子信息/通信</option><option>人工智能/大数据</option>
+          <option>数学/统计</option><option>经管/金融</option><option>市场营销/广告</option>
+          <option>设计/传媒</option><option>机械/自动化</option><option>外语/国际贸易</option>
+          <option>法学</option><option>不限专业</option>
+        </select>
+      </div>
+      <button class="btn-reset" id="idxReset">↻ 重置筛选</button>
+      <span class="result-count" id="idxCount">共找到 <b>0</b> 个实习岗位</span>
+    </div>
+
+    <!-- 实习卡片 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="company-logo" style="background:linear-gradient(135deg,#667eea,#764ba2)">字</div>
+        <div class="card-info">
+          <div class="card-title">前端开发实习生</div>
+          <div class="card-company">字节跳动 · 北京海淀</div>
+        </div>
+        <div class="salary">¥400-500/天</div>
+      </div>
+      <div class="card-meta">
+        <span>📍 北京·海淀</span>
+        <span>📅 截止 2026/07/20</span>
+        <span>👥 招5人</span>
+        <span>🎓 本科及以上</span>
+        <span>⏰ 4天/周 · 3个月</span>
+      </div>
+      <div class="card-tags">
+        <span class="card-tag">React</span>
+        <span class="card-tag">TypeScript</span>
+        <span class="card-tag">Node.js</span>
+        <span class="card-tag">有转正机会</span>
+      </div>
+      <div class="card-bottom">
+        <div class="poster">
+          <span class="poster-avatar">张</span>
+          <span>张三（清华·计算机）分享 · 2小时前</span>
+        </div>
+        <a href="detail.html?id=1" class="card-detail-link" onclick="event.stopPropagation()">查看详情 →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="company-logo" style="background:linear-gradient(135deg,#f093fb,#f5576c)">阿</div>
+        <div class="card-info">
+          <div class="card-title">产品经理实习生</div>
+          <div class="card-company">阿里巴巴 · 杭州余杭</div>
+        </div>
+        <div class="salary">¥350-450/天</div>
+      </div>
+      <div class="card-meta">
+        <span>📍 杭州·余杭</span>
+        <span>📅 截止 2026/08/15</span>
+        <span>👥 招3人</span>
+        <span>🎓 硕士优先</span>
+        <span>⏰ 5天/周 · 6个月</span>
+      </div>
+      <div class="card-tags">
+        <span class="card-tag">B端产品</span>
+        <span class="card-tag">数据分析</span>
+        <span class="card-tag">有转正机会</span>
+      </div>
+      <div class="card-bottom">
+        <div class="poster">
+          <span class="poster-avatar">王</span>
+          <span>王同学（浙大·产品设计）分享 · 5小时前</span>
+        </div>
+        <a href="detail.html?id=2" class="card-detail-link" onclick="event.stopPropagation()">查看详情 →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="company-logo" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">腾</div>
+        <div class="card-info">
+          <div class="card-title">Golang后端开发实习生</div>
+          <div class="card-company">腾讯 · 深圳南山</div>
+        </div>
+        <div class="salary">¥450-550/天</div>
+      </div>
+      <div class="card-meta">
+        <span>📍 深圳·南山</span>
+        <span>📅 截止 2026/07/30</span>
+        <span>👥 招8人</span>
+        <span>🎓 本科及以上</span>
+        <span>⏰ 4天/周 · 3个月</span>
+      </div>
+      <div class="card-tags">
+        <span class="card-tag">Go</span>
+        <span class="card-tag">微服务</span>
+        <span class="card-tag">分布式</span>
+        <span class="card-tag">导师带教</span>
+      </div>
+      <div class="card-bottom">
+        <div class="poster">
+          <span class="poster-avatar">陈</span>
+          <span>陈学长（华科·CS）分享 · 昨天</span>
+        </div>
+        <a href="detail.html?id=2" class="card-detail-link" onclick="event.stopPropagation()">查看详情 →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="company-logo" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">美</div>
+        <div class="card-info">
+          <div class="card-title">数据分析实习生</div>
+          <div class="card-company">美团 · 上海杨浦</div>
+        </div>
+        <div class="salary">¥300-400/天</div>
+      </div>
+      <div class="card-meta">
+        <span>📍 上海·杨浦</span>
+        <span>📅 截止 2026/08/01</span>
+        <span>👥 招4人</span>
+        <span>🎓 本科及以上</span>
+        <span>⏰ 4天/周 · 4个月</span>
+      </div>
+      <div class="card-tags">
+        <span class="card-tag">SQL</span>
+        <span class="card-tag">Python</span>
+        <span class="card-tag">Tableau</span>
+        <span class="card-tag">可转正</span>
+      </div>
+      <div class="card-bottom">
+        <div class="poster">
+          <span class="poster-avatar">刘</span>
+          <span>刘学姐（上交·数据科学）分享 · 昨天</span>
+        </div>
+        <a href="detail.html?id=2" class="card-detail-link" onclick="event.stopPropagation()">查看详情 →</a>
+      </div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination">
+      <span class="page-btn">‹</span>
+      <span class="page-btn active">1</span>
+      <span class="page-btn">2</span>
+      <span class="page-btn">3</span>
+      <span class="page-btn">…</span>
+      <span class="page-btn">8</span>
+      <span class="page-btn">›</span>
+    </div>
+
+  </div>
+  <!-- ===== 左侧结束 ===== -->
+
+  <!-- ===== 右侧边栏 ===== -->
+  <aside class="sidebar">
+
+    <!-- 发布入口 -->
+    <div class="widget publish-widget">
+      <div class="icon">📤</div>
+      <div class="title">你也有实习信息要分享？</div>
+      <div class="subtitle">帮助同学，一起打破信息差</div>
+      <a href="publish.html" class="btn-publish" style="display:block;text-decoration:none">📤 发布实习信息</a>
+    </div>
+
+    <!-- 个人快捷入口（仅登录后显示） -->
+    <div class="widget" id="sidebarUserCard" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div class="avatar" id="sidebarAvatar" style="width:44px;height:44px;font-size:18px">我</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;color:#1f2937" id="sidebarUsername">--</div>
+          <div style="font-size:12px;color:#9ca3af" id="sidebarRole">--</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="profile.html"     style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#eef2ff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;color:#4f46e5">👤 我的主页</a>
+        <a href="edit.html"        style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f9fafb;border-radius:10px;text-decoration:none;font-size:14px;font-weight:500;color:#374151">⚙️ 修改信息</a>
+        <a href="bind-email.html"  id="sidebarBindLink" style="display:none;align-items:center;gap:8px;padding:10px 14px;background:#fefce8;border-radius:10px;text-decoration:none;font-size:14px;font-weight:500;color:#92400e">📧 绑定邮箱升级会员</a>
+      </div>
+    </div>
+
+    <!-- 热门排行 -->
+    <div class="widget" id="hotListWidget">
+      <h3>🔥 同学热投</h3>
+      <div class="hot-item">
+        <span class="hot-rank top">1</span>
+        <span class="info">字节跳动 · 前端开发实习生</span>
+        <span class="pay">¥400-500</span>
+      </div>
+      <div class="hot-item">
+        <span class="hot-rank top">2</span>
+        <span class="info">腾讯 · Golang后端实习生</span>
+        <span class="pay">¥450-550</span>
+      </div>
+      <div class="hot-item">
+        <span class="hot-rank top">3</span>
+        <span class="info">美团 · 算法实习生</span>
+        <span class="pay">¥500-600</span>
+      </div>
+      <div class="hot-item">
+        <span class="hot-rank">4</span>
+        <span class="info">小红书 · 运营实习生</span>
+        <span class="pay">¥200-300</span>
+      </div>
+      <div class="hot-item">
+        <span class="hot-rank">5</span>
+        <span class="info">蔚来 · 自动驾驶算法</span>
+        <span class="pay">¥450-550</span>
+      </div>
+    </div>
+
+    <!-- 即将截止 -->
+    <div class="widget" id="urgentListWidget">
+      <h3>⏰ 即将截止投递</h3>
+      <div class="hot-item">
+        <span class="deadline-dot urgent"></span>
+        <span class="info">华为 · 硬件工程师实习</span>
+      </div>
+      <div class="hot-item">
+        <span class="deadline-dot warning"></span>
+        <span class="info">网易 · 游戏开发实习</span>
+      </div>
+      <div class="hot-item">
+        <span class="deadline-dot warning"></span>
+        <span class="info">京东 · 供应链实习</span>
+      </div>
+    </div>
+
+    <!-- 订阅 -->
+    <div class="widget" id="subscribeWidget">
+      <h3>📬 订阅新分享</h3>
+      <div id="subscribeLoginPrompt" style="text-align:center;padding:16px;color:#9ca3af;font-size:13px">
+        <a href="login.html" style="color:#4f46e5;font-weight:600;text-decoration:none">登录</a>后可订阅，匹配的实习发布时第一时间通知你
+      </div>
+      <div id="subscribeForm" style="display:none">
+        <div class="subscribe-box" style="text-align:left">
+          <input type="text" id="subKeyword" placeholder="关键词（岗位/公司名）" style="margin-bottom:8px">
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <select id="subCity" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px">
+              <option value="">不限城市</option><option>北京</option><option>上海</option><option>广州</option><option>深圳</option><option>杭州</option><option>成都</option>
+            </select>
+            <select id="subJobType" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px">
+              <option value="">不限岗位</option><option>技术开发</option><option>产品经理</option><option>数据分析</option><option>运营</option>
+            </select>
+          </div>
+          <button onclick="doSubscribe()">📬 立即订阅</button>
+        </div>
+        <div id="mySubs" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+  </aside>
+  <!-- ===== 侧边栏结束 ===== -->
+
+</div>
+
+<!-- ===== 公共页脚 ===== -->
+<div data-component="footer"></div>
+
+<script src="js/components.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+/* ===== 首页动态加载 ===== */
+var currentSort = 'latest';
+var currentPage = 1;
+
+loadList();
+loadSidebar();
+
+// 筛选变更
+['idxJobType','idxCity','idxMajor'].forEach(function(id) {
+  var sel = document.getElementById(id); if (!sel) return;
+  sel.addEventListener('change', function() { currentPage = 1; loadList(); });
+});
+// 重置
+document.getElementById('idxReset').addEventListener('click', function() {
+  document.getElementById('idxJobType').value = '';
+  document.getElementById('idxCity').value = '';
+  document.getElementById('idxMajor').value = '';
+  currentSort = 'latest'; currentPage = 1;
+  loadList();
+});
+
+async function loadList() {
+  var jt = document.getElementById('idxJobType').value;
+  var ct = document.getElementById('idxCity').value;
+  var mj = document.getElementById('idxMajor').value;
+  try {
+    var result = await InternAPI.list({ job_type: jt||undefined, city: ct||undefined, major: mj||undefined, sort: currentSort, page: currentPage, limit: 20 });
+    if (!result.data || !result.data.length) { showEmpty(); return; }
+    var container = document.querySelector('.content');
+    container.querySelectorAll('.card,.pagination,.empty-state').forEach(function(c) { c.remove(); });
+    document.getElementById('idxCount').innerHTML = '共找到 <b>'+result.total+'</b> 个实习岗位';
+    result.data.forEach(function(item) { container.appendChild(createInternCard(item)); });
+    if (Math.ceil(result.total/result.limit) > 1) renderPagination(container, result.total, result.page, result.limit);
+  } catch(e) { console.log('后端未连接'); }
+}
+
+function showEmpty() {
+  var container = document.querySelector('.content');
+  container.querySelectorAll('.card,.pagination').forEach(function(c) { c.remove(); });
+  document.getElementById('idxCount').innerHTML = '共找到 <b>0</b> 个实习岗位';
+  container.insertAdjacentHTML('beforeend', '<div class="empty-state"><div class="icon">🔍</div><p>没有匹配的实习岗位</p></div>');
+}
+
+async function loadSidebar() {
+  try { var hot = await InternAPI.hot(); renderHotList(hot); } catch(e) {}
+  try { var urgent = await InternAPI.urgent(); renderUrgentList(urgent); } catch(e) {}
+}
+
+function createInternCard(item) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.onclick = function() { location.href = 'detail.html?id=' + item.id; };
+  div.style.cursor = 'pointer';
+  const logoChar = item.company ? item.company.charAt(0) : '?';
+  const colors = [
+    'linear-gradient(135deg,#667eea,#764ba2)',
+    'linear-gradient(135deg,#f093fb,#f5576c)',
+    'linear-gradient(135deg,#4facfe,#00f2fe)',
+    'linear-gradient(135deg,#43e97b,#38f9d7)',
+    'linear-gradient(135deg,#fa709a,#fee140)',
+    'linear-gradient(135deg,#a18cd1,#fbc2eb)',
+  ];
+  const bg = colors[item.id % colors.length];
+  const salary = item.salary_min ? '¥'+item.salary_min+'-'+item.salary_max+'/天' : '薪资面议';
+  const deadline = item.deadline ? new Date(item.deadline).toLocaleDateString('zh-CN') : '长期有效';
+  const tagsHtml = item.tags && item.tags.length
+    ? item.tags.map(function(t) { return '<span class="card-tag">'+escHtml(t)+'</span>'; }).join('')
+    : '';
+
+  div.innerHTML =
+    '<div class="card-top">'+
+      '<div class="company-logo" style="background:'+bg+'">'+logoChar+'</div>'+
+      '<div class="card-info">'+
+        '<div class="card-title">'+escHtml(item.title)+'</div>'+
+        '<div class="card-company">'+escHtml(item.company)+' · '+escHtml(item.city)+(item.district?' '+escHtml(item.district):'')+'</div>'+
+      '</div>'+
+      '<div class="salary">'+salary+'</div>'+
+    '</div>'+
+    '<div class="card-meta">'+
+      '<span>📍 '+escHtml(item.city)+'</span>'+
+      '<span>📅 截止 '+deadline+'</span>'+
+      (item.headcount ? '<span>👥 招'+item.headcount+'人</span>' : '')+
+      '<span>🎓 '+escHtml(item.education||'本科及以上')+'</span>'+
+      '<span>⏰ '+(item.days_per_week||4)+'天/周 · '+(item.duration_months||3)+'个月</span>'+
+    '</div>'+
+    (tagsHtml ? '<div class="card-tags">'+tagsHtml+'</div>' : '')+
+    '<div class="card-bottom">'+
+      '<div class="poster">'+
+        '<span class="poster-avatar">'+(item.username||'?').charAt(0)+'</span>'+
+        '<span>'+escHtml(item.username||'同学')+(item.school?'（'+escHtml(item.school)+'）':'')+'分享 · '+timeAgo(item.created_at)+'</span>'+
+      '</div>'+
+      '<a href="detail.html?id='+item.id+'" class="card-detail-link" onclick="event.stopPropagation()">查看详情 →</a>'+
+    '</div>';
+  return div;
+}
+
+function renderPagination(container, total, page, limit) {
+  const totalPages = Math.ceil(total / limit);
+  if (totalPages <= 1) return;
+  const pag = document.createElement('div');
+  pag.className = 'pagination';
+  pag.innerHTML = '<span class="page-btn">‹</span>';
+  const maxShow = 5;
+  let start = Math.max(1, page - 2);
+  let end = Math.min(totalPages, start + maxShow - 1);
+  if (end - start < maxShow - 1) start = Math.max(1, end - maxShow + 1);
+  for (let i = start; i <= end; i++) {
+    pag.innerHTML += `<span class="page-btn${i === page ? ' active' : ''}">${i}</span>`;
+  }
+  if (end < totalPages) pag.innerHTML += '<span class="page-btn">…</span><span class="page-btn">'+totalPages+'</span>';
+  pag.innerHTML += '<span class="page-btn">›</span>';
+  container.appendChild(pag);
+}
+
+function renderHotList(items) {
+  const widget = document.getElementById('hotListWidget');
+  if (!widget || !items.length) return;
+  const listHtml = items.map(function(item, i) {
+    return '<div class="hot-item" onclick="location.href=\'detail.html?id='+item.id+'\'" style="cursor:pointer">'+
+      '<span class="hot-rank'+(i<3?' top':'')+'">'+(i+1)+'</span>'+
+      '<span class="info">'+escHtml(item.company)+' · '+escHtml(item.title)+'</span>'+
+      '<span class="pay">'+(item.salary_min?'¥'+item.salary_min+'-'+item.salary_max:'')+'</span>'+
+    '</div>';
+  }).join('');
+  var h3 = widget.querySelector('h3');
+  widget.querySelectorAll('.hot-item').forEach(function(el){ el.remove() });
+  if (h3) h3.insertAdjacentHTML('afterend', listHtml);
+}
+
+function renderUrgentList(items) {
+  const widget = document.getElementById('urgentListWidget');
+  if (!widget || !items.length) return;
+  const listHtml = items.map(function(item, i) {
+    return '<div class="hot-item" onclick="location.href=\'detail.html?id='+item.id+'\'" style="cursor:pointer">'+
+      '<span class="deadline-dot '+(i===0?'urgent':'warning')+'"></span>'+
+      '<span class="info">'+escHtml(item.company)+' · '+escHtml(item.title)+'</span>'+
+    '</div>';
+  }).join('');
+  var h3 = widget.querySelector('h3');
+  widget.querySelectorAll('.hot-item').forEach(function(el){ el.remove() });
+  if (h3) h3.insertAdjacentHTML('afterend', listHtml);
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return mins + '分钟前';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + '小时前';
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return days + '天前';
+  if (days < 30) return Math.floor(days / 7) + '周前';
+  return Math.floor(days / 30) + '个月前';
+}
+
+/* ---- 订阅组件 ---- */
+document.addEventListener('components-loaded', initSubscribe);
+function initSubscribe() {
+  if (Auth.isLoggedIn()) {
+    document.getElementById('subscribeLoginPrompt').style.display = 'none';
+    document.getElementById('subscribeForm').style.display = '';
+    loadMySubs();
+  }
+}
+
+async function doSubscribe() {
+  if (!Auth.isLoggedIn()) { location.href = 'login.html'; return; }
+  var data = {
+    keyword: document.getElementById('subKeyword').value.trim() || null,
+    city: document.getElementById('subCity').value || null,
+    job_type: document.getElementById('subJobType').value || null,
+  };
+  if (!data.keyword && !data.city && !data.job_type) { alert('请至少填写一个订阅条件'); return; }
+  try {
+    await SubAPI.subscribe(data);
+    document.getElementById('subKeyword').value = '';
+    alert('✅ 订阅成功！');
+    loadMySubs();
+  } catch(e) { alert('订阅失败：' + e.message); }
+}
+
+async function loadMySubs() {
+  try {
+    var subs = await SubAPI.list();
+    var container = document.getElementById('mySubs');
+    if (!subs || !subs.length) { container.innerHTML = '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:8px">暂无订阅</div>'; return; }
+    container.innerHTML = '<div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px">我的订阅：</div>' +
+      subs.map(function(s) {
+        var parts = [s.keyword, s.city, s.job_type].filter(Boolean);
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f9fafb;border-radius:8px;margin-bottom:4px;font-size:12px">'+
+          '<span>🔔 '+escHtml(parts.join(' · ')||'全部')+'</span>'+
+          '<span style="color:#ef4444;cursor:pointer;font-weight:600" onclick="cancelSub('+s.id+')">取消</span></div>';
+      }).join('');
+  } catch(e) {}
+}
+
+async function cancelSub(id) {
+  try { await SubAPI.remove(id); loadMySubs(); } catch(e) { alert('取消失败') }
+}
+function escHtml(s) { if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML }
+</script>
+</body>
+</html>

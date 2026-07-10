@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>搜索"前端开发" | 实习通</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 公共顶栏（由 js/components.js 自动加载） -->
+<div data-component="header"></div>
+
+<!-- 搜索状态 -->
+<div class="search-header">
+  <div class="search-header-inner">
+    <h2>搜索 "<b>前端开发</b>" 相关实习</h2>
+    <div class="hint">共找到 <b>24</b> 条结果，按默认排序</div>
+  </div>
+</div>
+
+<!-- 排序 -->
+<div class="sort-bar">
+  <span class="label">排序：</span>
+  <span class="sort-btn active" data-sort="latest">最新发布</span>
+  <span class="sort-btn" data-sort="salary">薪资最高</span>
+  <span class="sort-btn" data-sort="popular">最多人投</span>
+  <span class="sort-btn" data-sort="deadline">即将截止</span>
+</div>
+
+<div class="main">
+  <div class="content">
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+      <div class="filter-select">
+        <span class="filter-label">岗位类型</span>
+        <select id="filterJobType">
+          <option value="">全部岗位</option>
+          <option>技术开发</option><option>产品经理</option><option>UI/UX 设计</option>
+          <option>数据分析</option><option>运营</option><option>市场商务</option>
+          <option>金融投资</option><option>人力资源</option><option>财务会计</option><option>法务合规</option>
+        </select>
+      </div>
+      <div class="filter-select">
+        <span class="filter-label">工作城市</span>
+        <select id="filterCity">
+          <option value="">全部城市</option>
+          <option>北京</option><option>上海</option><option>广州</option><option>深圳</option>
+          <option>杭州</option><option>成都</option><option>南京</option><option>武汉</option>
+          <option>西安</option><option>苏州</option><option>远程办公</option>
+        </select>
+      </div>
+      <div class="filter-select">
+        <span class="filter-label">专业方向</span>
+        <select id="filterMajor">
+          <option value="">全部专业</option>
+          <option>计算机/软件</option><option>电子信息/通信</option><option>人工智能/大数据</option>
+          <option>数学/统计</option><option>经管/金融</option><option>市场营销/广告</option>
+          <option>设计/传媒</option><option>机械/自动化</option><option>外语/国际贸易</option>
+          <option>法学</option><option>不限专业</option>
+        </select>
+      </div>
+      <button class="btn-reset" id="btnClearFilter">↻ 清除筛选</button>
+      <span class="result-count" id="resultCount">共找到 <b>0</b> 条结果</span>
+    </div>
+
+    <!-- 搜索结果卡片 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="company-logo" style="background:linear-gradient(135deg,#667eea,#764ba2)">字</div>
+        <div class="card-info">
+          <div class="card-title">前端开发实习生</div>
+          <div class="card-company">字节跳动 · 北京海淀</div>
+        </div>
+        <div class="salary">¥400-500/天</div>
+      </div>
+      <div class="card-meta">
+        <span>📍 北京</span><span>📅 截止 07/20</span><span>🎓 本科</span><span>⏰ 4天/周</span>
+      </div>
+      <div class="card-tags">
+        <span class="card-tag">React</span><span class="card-tag">TypeScript</span><span class="card-tag">Node.js</span><span class="card-tag">有转正机会</span>
+      </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:12px">参与抖音电商核心业务前端开发，使用 React + TypeScript 技术栈。导师一对一带教，提供免费三餐和健身房...</p>
+      <div class="card-bottom">
+        <div class="poster">
+          <span class="poster-avatar">张</span>
+          <span>张三（清华·计算机）分享 · 2小时前</span>
+        </div>
+        <a href="detail.html?id=1" class="card-detail-link">查看详情 →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="company-logo" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">美</div>
+        <div class="card-info">
+          <div class="card-title">Web前端开发实习生</div>
+          <div class="card-company">美团 · 北京朝阳</div>
+        </div>
+        <div class="salary">¥380-480/天</div>
+      </div>
+      <div class="card-meta">
+        <span>📍 北京</span><span>📅 截止 08/01</span><span>🎓 本科</span><span>⏰ 4天/周</span>
+      </div>
+      <div class="card-tags">
+        <span class="card-tag">Vue</span><span class="card-tag">JavaScript</span><span class="card-tag">小程序</span><span class="card-tag">可转正</span>
+      </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:12px">参与美团外卖前端业务开发，涉及 Vue 技术栈与微信小程序开发，团队氛围好...</p>
+      <div class="card-bottom">
+        <div class="poster">
+          <span class="poster-avatar">赵</span>
+          <span>赵同学（北邮·CS）分享 · 昨天</span>
+        </div>
+        <a href="detail.html?id=3" class="card-detail-link">查看详情 →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="company-logo" style="background:linear-gradient(135deg,#fa709a,#fee140)">快</div>
+        <div class="card-info">
+          <div class="card-title">前端实习生（React方向）</div>
+          <div class="card-company">快手 · 北京海淀</div>
+        </div>
+        <div class="salary">¥350-450/天</div>
+      </div>
+      <div class="card-meta">
+        <span>📍 北京</span><span>📅 截止 07/25</span><span>🎓 本科</span><span>⏰ 5天/周</span>
+      </div>
+      <div class="card-tags">
+        <span class="card-tag">React</span><span class="card-tag">Hooks</span><span class="card-tag">Node.js</span>
+      </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:12px">负责快手主站前端功能迭代，参与组件库建设，技术栈 React + Node.js，有转正答辩机会...</p>
+      <div class="card-bottom">
+        <div class="poster">
+          <span class="poster-avatar">钱</span>
+          <span>钱学长（北航·软件）分享 · 3天前</span>
+        </div>
+        <a href="detail.html?id=3" class="card-detail-link">查看详情 →</a>
+      </div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination">
+      <span class="page-btn">‹</span>
+      <span class="page-btn active">1</span>
+      <span class="page-btn">2</span>
+      <span class="page-btn">3</span>
+      <span class="page-btn">›</span>
+    </div>
+
+  </div>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="widget publish-widget">
+      <div class="icon">🔍</div>
+      <div class="title">没找到合适的？</div>
+      <div class="subtitle">试试订阅关键词，新岗位发布时通知你</div>
+      <a href="index.html" class="btn-publish" style="display:block;text-decoration:none">📬 去首页订阅</a>
+    </div>
+
+    <div class="widget">
+      <h3>🔗 相关搜索</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <span style="padding:6px 12px;background:#f3f4f6;border-radius:8px;font-size:12px;cursor:pointer;color:#4b5563">React开发</span>
+        <span style="padding:6px 12px;background:#f3f4f6;border-radius:8px;font-size:12px;cursor:pointer;color:#4b5563">Web全栈</span>
+        <span style="padding:6px 12px;background:#f3f4f6;border-radius:8px;font-size:12px;cursor:pointer;color:#4b5563">TypeScript</span>
+        <span style="padding:6px 12px;background:#f3f4f6;border-radius:8px;font-size:12px;cursor:pointer;color:#4b5563">Vue开发</span>
+        <span style="padding:6px 12px;background:#f3f4f6;border-radius:8px;font-size:12px;cursor:pointer;color:#4b5563">移动端开发</span>
+        <span style="padding:6px 12px;background:#f3f4f6;border-radius:8px;font-size:12px;cursor:pointer;color:#4b5563">UI组件库</span>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script src="js/components.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+/* ===== 搜索页动态加载 ===== */
+(function() {
+  var params = new URLSearchParams(location.search);
+  var keyword = params.get('q') || '';
+  var jobType = params.get('job_type') || '';
+  var city = params.get('city') || '';
+  var major = params.get('major') || '';
+  var sort = params.get('sort') || 'latest';
+
+  // 初始化筛选选中值
+  var jt = document.getElementById('filterJobType'); if (jt) jt.value = jobType;
+  var fc = document.getElementById('filterCity'); if (fc) fc.value = city;
+  var fm = document.getElementById('filterMajor'); if (fm) fm.value = major;
+
+  // 排序初始状态
+  document.querySelectorAll('.sort-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sort === sort); });
+
+  // 标题
+  var parts = [];
+  if (keyword) parts.push('"<b>'+escHtml(keyword)+'</b>"');
+  if (jobType) parts.push(escHtml(jobType));
+  if (city) parts.push(escHtml(city));
+  if (major) parts.push(escHtml(major));
+  document.querySelector('.search-header-inner h2').innerHTML = parts.length ? '搜索 '+parts.join(' · ')+' 相关实习' : '全部实习';
+
+  loadResults();
+
+  // 排序
+  document.querySelectorAll('.sort-btn').forEach(function(b) {
+    b.addEventListener('click', function() { params.set('sort', this.dataset.sort); location.search = params.toString(); });
+  });
+  // 筛选
+  [{id:'filterJobType',key:'job_type'},{id:'filterCity',key:'city'},{id:'filterMajor',key:'major'}].forEach(function(f) {
+    var s = document.getElementById(f.id); if (!s) return;
+    s.addEventListener('change', function() { if (s.value) params.set(f.key, s.value); else params.delete(f.key); location.search = params.toString(); });
+  });
+  // 清除
+  document.getElementById('btnClearFilter').addEventListener('click', function() {
+    var q = params.get('q'); location.search = q ? '?q='+encodeURIComponent(q)+'&sort='+sort : '?sort='+sort;
+  });
+  // 相关搜索
+  document.querySelectorAll('.sidebar .widget span[style]').forEach(function(t) {
+    t.style.cursor = 'pointer';
+    t.addEventListener('click', function() { location.search = '?q='+encodeURIComponent(this.textContent.trim()); });
+  });
+  // 静态卡片
+  document.querySelectorAll('.content > .card').forEach(function(c) {
+    var l = c.querySelector('.card-detail-link'); if (l) { c.onclick = function() { location.href = l.getAttribute('href'); }; c.style.cursor = 'pointer'; }
+  });
+
+  async function loadResults() {
+    try {
+      var result = await InternAPI.list({ keyword:keyword, job_type:jobType, city:city, major:major, sort:sort, limit:20 });
+      var container = document.querySelector('.content');
+      container.querySelectorAll('.card,.pagination,.empty-state').forEach(function(c) { c.remove(); });
+      document.querySelector('.search-header-inner .hint').innerHTML = '共找到 <b>'+result.total+'</b> 条结果';
+      document.querySelector('#resultCount b').textContent = result.total;
+      if (!result.data || !result.data.length) {
+        container.insertAdjacentHTML('beforeend', '<div class="empty-state"><div class="icon">🔍</div><p>没有找到匹配的实习</p></div>');
+        return;
+      }
+      result.data.forEach(function(item) { container.appendChild(createSearchCard(item)); });
+      if (Math.ceil(result.total/result.limit) > 1) renderPagination(container, result.total, result.page, result.limit);
+    } catch(e) { console.log('后端未连接，显示静态演示数据'); }
+  }
+})();
+
+function createSearchCard(item) {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.onclick = function() { location.href = 'detail.html?id=' + item.id; };
+  div.style.cursor = 'pointer';
+  const colors = ['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#fa709a,#fee140)'];
+  const bg = colors[item.id % colors.length];
+  const salary = item.salary_min ? '¥'+item.salary_min+'-'+item.salary_max+'/天' : '薪资面议';
+  const deadline = item.deadline ? new Date(item.deadline).toLocaleDateString('zh-CN') : '长期有效';
+  const desc = item.description ? item.description.slice(0, 100) + '...' : '';
+  const tagsHtml = item.tags && item.tags.length
+    ? item.tags.map(function(t) { return '<span class="card-tag">'+escHtml(t)+'</span>'; }).join('')
+    : '';
+
+  div.innerHTML =
+    '<div class="card-top">'+
+      '<div class="company-logo" style="background:'+bg+'">'+escHtml(item.company?item.company.charAt(0):'?')+'</div>'+
+      '<div class="card-info">'+
+        '<div class="card-title">'+escHtml(item.title)+'</div>'+
+        '<div class="card-company">'+escHtml(item.company)+' · '+escHtml(item.city)+'</div>'+
+      '</div>'+
+      '<div class="salary">'+salary+'</div>'+
+    '</div>'+
+    '<div class="card-meta">'+
+      '<span>📍 '+escHtml(item.city)+'</span><span>📅 截止 '+deadline+'</span><span>🎓 '+escHtml(item.education||'本科')+'</span><span>⏰ '+(item.days_per_week||4)+'天/周</span>'+
+    '</div>'+
+    (tagsHtml ? '<div class="card-tags">'+tagsHtml+'</div>' : '')+
+    (desc ? '<p style="font-size:13px;color:#6b7280;margin-bottom:12px">'+escHtml(desc)+'</p>' : '')+
+    '<div class="card-bottom">'+
+      '<div class="poster">'+
+        '<span class="poster-avatar">'+(item.username||'?').charAt(0)+'</span>'+
+        '<span>'+escHtml(item.username||'同学')+(item.school?'（'+escHtml(item.school)+'）':'')+'分享 · '+timeAgo(item.created_at)+'</span>'+
+      '</div>'+
+      '<a href="detail.html?id='+item.id+'" class="card-detail-link" onclick="event.stopPropagation()">查看详情 →</a>'+
+    '</div>';
+  return div;
+}
+
+function showEmpty(keyword) {
+  const container = document.querySelector('.content');
+  container.querySelectorAll('.card,.pagination').forEach(c => c.remove());
+  container.insertAdjacentHTML('beforeend',
+    '<div class="empty-state"><div class="icon">🔍</div><p>没有找到与 "<b>'+escHtml(keyword)+'</b>" 相关的实习信息</p><p style="font-size:13px;color:#9ca3af;margin-top:8px">试试换个关键词，或者发布你知道的实习信息</p></div>');
+}
+
+function renderPagination(container, total, page, limit) {
+  const totalPages = Math.ceil(total / limit);
+  if (totalPages <= 1) return;
+  const pag = document.createElement('div');
+  pag.className = 'pagination';
+  let html = '<span class="page-btn">‹</span>';
+  const maxShow = 5;
+  let start = Math.max(1, page - 2);
+  let end = Math.min(totalPages, start + maxShow - 1);
+  if (end - start < maxShow - 1) start = Math.max(1, end - maxShow + 1);
+  for (let i = start; i <= end; i++) {
+    html += '<span class="page-btn' + (i === page ? ' active' : '') + '">' + i + '</span>';
+  }
+  if (end < totalPages) html += '<span class="page-btn">…</span><span class="page-btn">' + totalPages + '</span>';
+  html += '<span class="page-btn">›</span>';
+  pag.innerHTML = html;
+  container.appendChild(pag);
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return mins + '分钟前';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + '小时前';
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return days + '天前';
+  if (days < 30) return Math.floor(days / 7) + '周前';
+  return Math.floor(days / 30) + '个月前';
+}
+</script>
+</body>
+</html>

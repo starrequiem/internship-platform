@@ -1,0 +1,104 @@
+继续开发「实习通」——大学生实习信息互助平台。项目代码在 C:\Users\屠庭宇\Desktop\internship-platform
+
+## 项目背景
+大学生互助分享实习信息的平台。用户注册登录、浏览搜索、发布实习、收藏、偏好标签、订阅通知、投递追踪。
+
+## 运行环境
+- Windows 11 / Node.js v24 / Python 3.x / MySQL 8.0
+- 后端：Node.js + Express（端口 3000）
+- 前端：Python HTTP Server（端口 8080）
+- 数据库：MySQL 8.0，库名 internship_platform，用户 root/200619
+
+## 项目结构
+```
+internship-platform/
+├── *.html              # 全部页面（13个）
+├── css/style.css       # 全站样式
+├── js/                 # api.js / auth.js / components.js
+├── components/         # header.html / footer.html
+├── server/             # Express API (app.js + routes/)
+├── sql/                # 建表/种子/迁移脚本
+├── docs/               # 提示词 + 调试账号
+├── images/             # 图片资源
+├── 一键启动.bat         # 双击启动全部服务
+└── 一键关闭.bat         # 双击停止全部服务
+```
+
+## 启动方式（推荐：双击 一键启动.bat）
+- 自动启 MySQL → 后端 → 前端 → 打开浏览器 http://localhost:8080
+- 手动：cd server && node app.js（后端） + python server.py（前端）
+- 数据库重建：mysql -u root -p200619 internship_platform < sql/schema-mysql.sql && mysql ... < sql/seed-data.sql
+
+## 测试账号
+| 用户名 | 密码 | 角色 | 说明 |
+|--------|------|------|------|
+| admin | admin123 | 🛡️ 管理员 | 全权限，无需绑邮箱，可进 /admin/login.html |
+| 张三 | 123456 | ✨ 会员 | 已绑邮箱，可发布/收藏/评论 |
+| 王同学 | 123456 | 📋 普通 | 只能浏览，发布需先绑邮箱 |
+| 陈学长 | 123456 | 📋 普通 | 只能浏览 |
+| 刘学姐 | 123456 | 📋 普通 | 注册时未填邮箱，需先绑邮箱 |
+
+## 已完成的全部功能
+
+### 页面清单（13个HTML）
+- index.html — 首页：搜索框+筛选栏(岗位/城市/专业 联动API)+卡片列表(整卡可点)+热门排行+即将截止+订阅组件+分页
+- detail.html — 详情：动态加载API+收藏/感谢按钮(会员权限)+投递追踪+相关推荐
+- profile.html — 个人主页：统计+偏好标签(8色Pixiv风)+Tab(分享/收藏/评价API)+会员标识+绑邮箱链接
+- publish.html — 发布/编辑：Logo上传+全字段表单+标签提示+编辑模式(?edit=ID)
+- edit.html — 信息修改：头像上传+个人资料(学校/专业/年级/简介/邮箱)+我的发布(内联编辑+修改时间+关闭)
+- search.html — 搜索：关键词搜索9字段(title/company/city/job_type/major/tag/desc/req/district)+筛选联动+排序+分页
+- bind-email.html — 邮箱绑定：验证码模式(开发期控制台输出)+快速选取注册邮箱+管理员/已会员跳过
+- forgot-password.html — 忘记密码：用户名+邮箱→验证码→新密码(控制台输出)
+- notifications.html — 通知中心：订阅匹配通知+未读蓝边+铃铛badge+全部已读
+- applications.html — 投递追踪：状态标签(已查看/已投递/面试/录取/未通过)+时间线
+- login.html — 登录：后端+离线演示双模式，三种角色可用
+- register.html — 注册：邮箱选填(可为null可重复)，仅用户名+密码必填
+- default.html — 功能维护占位页
+- admin/login.html + admin/index.html — 管理后台（暗色主题）
+
+### 会员权限体系
+- 普通用户(view-only) → 会员(绑邮箱后) → 管理员(全权限)
+- 管理员 isMember() 直接返回 true，无需绑邮箱
+- 非会员使用发布/收藏/感谢时自动跳转 bind-email.html
+- users 表：is_member / email_verified 字段
+
+### 后端 API（13个路由模块）
+- internships.js — CRUD+筛选/搜索(9字段含tag子查询)/排序/分页/热门/即将截止/关闭+发布时触发订阅通知
+- users.js — 注册/登录(JWT+会员状态)/资料修改/密码修改/忘记密码/邮箱绑定(验证码Map)
+- favorites.js / tags.js / subscriptions.js / preferences.js / thanks.js / upload.js / admin.js
+- notifications.js — 通知列表/未读数/标记已读
+- applications.js — 投递记录(POST+GET，UNIQUE防重)
+- auth.js 中间件 — requireAuth/optionalAuth + 用户+管理员双JWT密钥
+
+### 数据库（6个迁移脚本 + 7张业务表）
+- users / internships / tags / internship_tags / favorites / subscriptions / thanks
+- user_tag_preferences / notifications / applications
+- 种子数据：5用户 / 7实习 / 20标签 / 19关联 / 8收藏 / 17偏好 / 4感谢
+
+### 前端JS模块
+- api.js — InternAPI / UserAPI / FavAPI / TagAPI / SubAPI / NotifAPI / AppAPI / uploadFile()，参数自动过滤空值
+- auth.js — 登录/注册/JWT/会员判断/管理员判断/顶栏UI/侧边栏卡片/通知badge刷新
+- components.js — fetch+XHR双保险加载header/footer
+
+### 搜索
+- 关键词覆盖：title/company/description/city/district/job_type/target_major/requirements/tags
+- 城市/岗位/专业可单独筛选也可组合
+- 筛选栏 change 实时调API，重置按钮清空条件
+
+### 静态演示版
+- C:\Users\屠庭宇\Desktop\实习通-静态演示版\
+- 所有前端文件同步，登录页离线演示模式，API失败时回退静态数据
+
+## 待完成
+1. 邮件服务接入（验证码/通知/忘记密码目前都是控制台输出）
+2. 移动端真机全面测试
+3. 部署上线（服务器、域名、HTTPS、环境变量管理）
+
+## 注意事项
+- 中文路径注意编码，curl 测试中文用文件方式：curl -d @file.json
+- 前端必须 http://localhost:8080，file:// 组件加载不了
+- 两个 JWT 密钥：internship-platform-secret（用户）/ internship-platform-admin-secret（管理员）
+- 管理员 token 也能调用用户接口（parseToken 依次尝试两个密钥）
+- api.js 已过滤 undefined/null/'' 参数，URLSearchParams 不会传 "undefined" 字符串
+- 列表接口已批量返回 tags，卡片渲染直接使用 item.tags
+- 卡住就重跑

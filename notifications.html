@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>通知中心 | 实习通</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .notif-main { max-width:700px;margin:0 auto;padding:24px }
+  .notif-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:20px }
+  .notif-header h1 { font-size:22px;font-weight:700;color:#1f2937 }
+  .btn-read-all { padding:8px 18px;background:#fff;color:#4f46e5;border:1px solid #4f46e5;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s }
+  .btn-read-all:hover { background:#eef2ff }
+  .notif-card { background:#fff;border-radius:14px;padding:18px 20px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;border:1px solid #f3f4f6;cursor:pointer;transition:all .2s }
+  .notif-card:hover { border-color:#c7d2fe }
+  .notif-card.unread { border-left:3px solid #4f46e5;background:#fafaff }
+  .notif-card.read { opacity:.6 }
+  .notif-icon { font-size:20px;flex-shrink:0;margin-top:2px }
+  .notif-body { flex:1;min-width:0 }
+  .notif-body .title { font-size:14px;font-weight:700;color:#1f2937;margin-bottom:4px }
+  .notif-body .content { font-size:13px;color:#6b7280;line-height:1.5;margin-bottom:4px }
+  .notif-body .time { font-size:12px;color:#9ca3af }
+  .empty-state { text-align:center;padding:80px 20px }
+  .empty-state .icon { font-size:64px;margin-bottom:16px }
+</style>
+</head>
+<body>
+<div data-component="header"></div>
+
+<div class="notif-main">
+  <div class="notif-header">
+    <h1>🔔 通知中心</h1>
+    <button class="btn-read-all" onclick="markAllRead()">✅ 全部已读</button>
+  </div>
+  <div id="notifList">
+    <div style="text-align:center;padding:40px;color:#9ca3af">加载中...</div>
+  </div>
+</div>
+
+<script src="js/components.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+(async function() {
+  if (!Auth.isLoggedIn()) { location.href = 'login.html?redirect=notifications.html'; return; }
+  try {
+    var notifs = await NotifAPI.list();
+    renderNotifs(notifs);
+  } catch(e) {
+    renderNotifs([
+      { id:1, type:'subscription', title:'新实习匹配：前端开发实习生', content:'字节跳动 发布了一个技术开发岗位「前端开发实习生」，地点北京，和你的订阅条件匹配', internship_id:1, is_read:0, created_at:'2026-07-10T10:30:00' },
+      { id:2, type:'subscription', title:'新实习匹配：算法实习生', content:'美团 发布了一个技术开发岗位「算法实习生」，地点上海，和你的订阅条件匹配', internship_id:4, is_read:0, created_at:'2026-07-09T14:20:00' },
+      { id:3, type:'subscription', title:'新实习匹配：Java后端实习生', content:'华为 发布了一个技术开发岗位「Java后端实习生」，地点深圳，和你的订阅条件匹配', internship_id:5, is_read:1, created_at:'2026-07-08T09:00:00' },
+    ]);
+  }
+})();
+
+function renderNotifs(notifs) {
+  var container = document.getElementById('notifList');
+  if (!notifs || !notifs.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">🔔</div><p>暂无通知</p></div>';
+    return;
+  }
+  container.innerHTML = notifs.map(function(n) {
+    return '<div class="notif-card '+(n.is_read?'read':'unread')+'" onclick="openNotif('+n.id+','+(n.internship_id||0)+')">'+
+      '<div class="notif-icon">📬</div>'+
+      '<div class="notif-body"><div class="title">'+escHtml(n.title)+'</div><div class="content">'+escHtml(n.content)+'</div><div class="time">'+timeAgo(new Date(n.created_at))+'</div></div>'+
+    '</div>';
+  }).join('');
+}
+
+async function openNotif(notifId, internId) {
+  try { await NotifAPI.markRead(notifId); } catch(_) {}
+  if (internId) location.href = 'detail.html?id=' + internId;
+}
+
+async function markAllRead() {
+  try { await NotifAPI.markAllRead(); location.reload(); } catch(e) { alert('操作失败') }
+}
+
+function timeAgo(d) { var diff=Date.now()-d.getTime(), m=Math.floor(diff/60000); if(m<1)return'刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';var day=Math.floor(h/24);if(day<30)return day+'天前';return Math.floor(day/30)+'个月前' }
+function escHtml(s) { if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML }
+</script>
+</body>
+</html>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人主页 | 实习通</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* ===== 偏好标签区域（Pixiv风格） ===== */
+  .pref-section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .pref-section h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+  }
+  .pref-section .pref-desc {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-bottom: 16px;
+  }
+  .pref-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .pref-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s;
+    border: 2px solid #e5e7eb;
+    background: #fff;
+    color: #374151;
+  }
+  .pref-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  }
+  .pref-tag .remove {
+    font-size: 16px;
+    line-height: 1;
+    opacity: .4;
+    transition: opacity .2s;
+    margin-left: 2px;
+  }
+  .pref-tag:hover .remove {
+    opacity: 1;
+    color: #ef4444;
+  }
+  /* 不同颜色变体 */
+  .pref-tag.c0 { border-color: #c7d2fe; background: #eef2ff; color: #4f46e5; }
+  .pref-tag.c1 { border-color: #fecaca; background: #fef2f2; color: #dc2626; }
+  .pref-tag.c2 { border-color: #bbf7d0; background: #f0fdf4; color: #16a34a; }
+  .pref-tag.c3 { border-color: #fde68a; background: #fefce8; color: #ca8a04; }
+  .pref-tag.c4 { border-color: #c4b5fd; background: #faf5ff; color: #7c3aed; }
+  .pref-tag.c5 { border-color: #fed7aa; background: #fff7ed; color: #ea580c; }
+  .pref-tag.c6 { border-color: #a5f3fc; background: #ecfeff; color: #0891b2; }
+  .pref-tag.c7 { border-color: #fbcfe8; background: #fdf2f8; color: #db2777; }
+
+  .pref-add-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .pref-add-row input {
+    flex: 1;
+    max-width: 220px;
+    padding: 9px 14px;
+    border: 2px dashed #e5e7eb;
+    border-radius: 20px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: all .25s;
+    background: #fafbfc;
+  }
+  .pref-add-row input:focus {
+    border-color: #4f46e5;
+    border-style: solid;
+    background: #fff;
+  }
+  .pref-add-row input::placeholder { color: #d1d5db; }
+  .pref-add-btn {
+    padding: 9px 18px;
+    border-radius: 20px;
+    border: none;
+    background: #4f46e5;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .pref-add-btn:hover { background: #4338ca; }
+
+  /* 空状态 */
+  .pref-empty {
+    text-align: center;
+    padding: 20px;
+    color: #9ca3af;
+    font-size: 13px;
+  }
+
+  /* 评价tab暂时占位 */
+  .thanks-item {
+    padding: 16px;
+    background: #fafbfc;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .thanks-item .avatar-sm {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#eef2ff,#ddd6fe);
+    color: #4f46e5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- 公共顶栏 -->
+<div data-component="header"></div>
+
+<div class="profile-main">
+
+  <!-- 个人信息卡片 -->
+  <div class="profile-header" id="profileHeader">
+    <div class="profile-avatar" id="profileAvatar">?</div>
+    <div class="profile-info">
+      <h1 id="profileName">加载中...</h1>
+      <div class="school" id="profileSchool"></div>
+      <div class="bio" id="profileBio"></div>
+      <div class="profile-stats" style="margin-top:12px">
+        <div class="profile-stat"><div class="num" id="statShare">0</div><div class="lbl">分享岗位</div></div>
+        <div class="profile-stat"><div class="num" id="statHelp">0</div><div class="lbl">帮助同学</div></div>
+        <div class="profile-stat"><div class="num" id="statThanks">0</div><div class="lbl">收到感谢</div></div>
+      </div>
+      <div class="profile-member-row" style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span id="memberBadge" style="font-size:12px;padding:4px 12px;border-radius:20px;font-weight:600"></span>
+        <a href="edit.html" style="font-size:12px;color:#4f46e5;text-decoration:none;font-weight:500">✏️ 编辑资料</a>
+        <a href="bind-email.html" id="bindEmailLink" style="font-size:12px;color:#f59e0b;text-decoration:none;font-weight:500;display:none">📧 绑定邮箱升级会员</a>
+      </div>
+    </div>
+    <button class="btn-edit-profile" onclick="location.href='edit.html'">✏️ 编辑资料</button>
+  </div>
+
+  <!-- 偏好标签（Pixiv风格） -->
+  <div class="pref-section" id="prefSection">
+    <h3>🏷️ 偏好标签</h3>
+    <p class="pref-desc">标记你感兴趣的方向，系统会优先推荐相关实习</p>
+    <div class="pref-tags" id="prefTags">
+      <div class="pref-empty">加载中...</div>
+    </div>
+    <div class="pref-add-row">
+      <input type="text" id="prefInput" placeholder="输入标签，回车添加..." maxlength="20">
+      <button class="pref-add-btn" onclick="addPreference()">+ 添加</button>
+    </div>
+  </div>
+
+  <!-- 标签页切换 -->
+  <div class="profile-tabs">
+    <button class="profile-tab active" data-tab="shared">📋 TA分享的实习</button>
+    <button class="profile-tab" data-tab="favs">⭐ TA收藏的</button>
+    <button class="profile-tab" data-tab="thanks">👍 收到的感谢</button>
+  </div>
+
+  <!-- 内容区 -->
+  <div class="profile-card-grid" id="profileGrid">
+    <!-- 动态加载 -->
+  </div>
+
+  <!-- 感谢列表容器 -->
+  <div id="thanksList" style="display:none"></div>
+
+</div>
+
+<script src="js/components.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+/* ===== 用户页动态加载 ===== */
+const urlParams = new URLSearchParams(location.search);
+let currentUserId = urlParams.get('id');
+let currentTab = 'shared';
+
+(async function init() {
+  // 如果没有指定id，尝试使用登录用户，否则默认id=1
+  if (!currentUserId) {
+    const user = Auth.getUser();
+    currentUserId = user ? user.id : '1';
+  }
+
+  try {
+    await loadUserProfile(currentUserId);
+    await loadPreferences(currentUserId);
+    await loadTabContent(currentUserId, 'shared');
+    checkOwnProfile();
+  } catch(e) {
+    console.log('后端未连接，显示静态演示数据');
+  }
+
+  // Tab 切换
+  document.querySelectorAll('.profile-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      currentTab = this.dataset.tab;
+      loadTabContent(currentUserId, currentTab);
+    });
+  });
+
+  // 偏好标签输入回车
+  document.getElementById('prefInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') addPreference();
+  });
+})();
+
+async function loadUserProfile(uid) {
+  try {
+    const user = await UserAPI.profile(uid);
+    document.title = user.username + '的个人主页 | 实习通';
+    document.getElementById('profileAvatar').textContent = (user.username||'?').charAt(0);
+    document.getElementById('profileName').textContent = user.username || '未知用户';
+    document.getElementById('profileSchool').innerHTML =
+      (user.school ? '🎓 ' + escHtml(user.school) : '') +
+      (user.major ? ' · ' + escHtml(user.major) : '') +
+      (user.grade ? ' · ' + escHtml(user.grade) : '');
+    document.getElementById('profileBio').textContent = user.bio || '';
+    document.getElementById('statShare').textContent = user.share_count || 0;
+    document.getElementById('statHelp').textContent = user.thanks_count ? Math.floor(user.thanks_count * 27) : 0;
+    document.getElementById('statThanks').textContent = user.thanks_count || 0;
+  } catch(e) {
+    // 保留静态演示数据
+  }
+}
+
+/* ---- 偏好标签 ---- */
+async function loadPreferences(uid) {
+  try {
+    const tags = await UserAPI.preferences(uid);
+    const container = document.getElementById('prefTags');
+    if (!tags || !tags.length) {
+      container.innerHTML = '<div class="pref-empty">还没有偏好标签，在下方添加你感兴趣的技术栈和关键词</div>';
+      return;
+    }
+    container.innerHTML = tags.map((t, i) =>
+      '<span class="pref-tag c'+(i%8)+'" data-tag="'+escHtml(t.tag_name)+'">'+
+        escHtml(t.tag_name)+
+        '<span class="remove" onclick="removePreference(\''+escJs(t.tag_name)+'\')" title="删除">×</span>'+
+      '</span>'
+    ).join('');
+  } catch(e) {
+    document.getElementById('prefTags').innerHTML =
+      '<div class="pref-empty">后端未连接，无法加载偏好标签</div>';
+  }
+}
+
+async function addPreference() {
+  const input = document.getElementById('prefInput');
+  const tagName = input.value.trim();
+  if (!tagName) return;
+  // 只有自己的主页才能添加
+  const user = Auth.getUser();
+  if (!user || String(user.id) !== String(currentUserId)) {
+    alert('只能在自己的主页添加偏好标签');
+    return;
+  }
+  try {
+    await UserAPI.addPreference(currentUserId, tagName);
+    input.value = '';
+    loadPreferences(currentUserId);
+  } catch(e) {
+    alert('添加失败：' + e.message);
+  }
+}
+
+async function removePreference(tagName) {
+  const user = Auth.getUser();
+  if (!user || String(user.id) !== String(currentUserId)) {
+    alert('只能在自己的主页删除偏好标签');
+    return;
+  }
+  try {
+    await UserAPI.removePreference(currentUserId, tagName);
+    loadPreferences(currentUserId);
+  } catch(e) {
+    alert('删除失败：' + e.message);
+  }
+}
+
+/* ---- Tab 内容 ---- */
+async function loadTabContent(uid, tab) {
+  const grid = document.getElementById('profileGrid');
+  const thanksDiv = document.getElementById('thanksList');
+  grid.style.display = '';
+  thanksDiv.style.display = 'none';
+  thanksDiv.innerHTML = '';
+
+  if (tab === 'shared') {
+    try {
+      const data = await UserAPI.internships(uid);
+      if (!data || !data.length) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>还没有分享过实习信息</p></div>';
+        return;
+      }
+      grid.innerHTML = data.map(item => createProfileCard(item)).join('');
+    } catch(e) {
+      // 保留静态数据
+    }
+  } else if (tab === 'favs') {
+    try {
+      const data = await UserAPI.favorites(uid);
+      if (!data || !data.length) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">⭐</div><p>还没有收藏过实习信息</p></div>';
+        return;
+      }
+      grid.innerHTML = data.map(item => createProfileCard(item)).join('');
+    } catch(e) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">⭐</div><p>后端未连接</p></div>';
+    }
+  } else if (tab === 'thanks') {
+    grid.style.display = 'none';
+    thanksDiv.style.display = 'block';
+    try {
+      const resp = await fetch(API_BASE + '/thanks/received/' + uid);
+      if (resp.ok) {
+        const thanks = await resp.json();
+        if (!thanks || !thanks.length) {
+          thanksDiv.innerHTML = '<div class="empty-state" style="padding:40px"><p>还没有收到感谢</p></div>';
+          return;
+        }
+        thanksDiv.innerHTML = thanks.map(t => {
+          const time = timeAgo(new Date(t.created_at));
+          return '<div class="thanks-item">'+
+            '<div class="avatar-sm">'+(t.from_username||'?').charAt(0)+'</div>'+
+            '<div><b>'+escHtml(t.from_username)+'</b> 感谢了你的分享'+
+            (t.message ? '："'+escHtml(t.message)+'"' : '')+
+            (t.internship_title ? ' <span style="color:#9ca3af;font-size:12px">['+escHtml(t.internship_title)+']</span>' : '')+
+            ' <span style="color:#9ca3af;margin-left:8px">'+time+'</span></div>'+
+          '</div>';
+        }).join('');
+      } else {
+        throw new Error('API error');
+      }
+    } catch(e) {
+      thanksDiv.innerHTML = `
+        <div class="thanks-item">
+          <div class="avatar-sm">王</div>
+          <div><b>王同学</b> 感谢了你的分享："感谢分享，已经拿到offer了！" <span style="color:#9ca3af;margin-left:8px">3天前</span></div>
+        </div>
+        <div class="thanks-item">
+          <div class="avatar-sm">陈</div>
+          <div><b>陈学长</b> 感谢了你的分享："谢谢学长的信息，面试中" <span style="color:#9ca3af;margin-left:8px">1周前</span></div>
+        </div>`;
+    }
+  }
+}
+
+function createProfileCard(item) {
+  const colors = ['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#fa709a,#fee140)','linear-gradient(135deg,#a18cd1,#fbc2eb)'];
+  const bg = colors[item.id % colors.length];
+  const salary = item.salary_min ? '¥'+item.salary_min+'-'+item.salary_max+'/天' : '薪资面议';
+  const deadline = item.deadline ? new Date(item.deadline).toLocaleDateString('zh-CN',{month:'2-digit',day:'2-digit'}) : '长期';
+
+  return '<div class="card">'+
+    '<div class="card-top">'+
+      '<div class="company-logo" style="background:'+bg+'">'+escHtml(item.company?.charAt(0)||'?')+'</div>'+
+      '<div class="card-info">'+
+        '<div class="card-title">'+escHtml(item.title)+'</div>'+
+        '<div class="card-company">'+escHtml(item.company)+' · '+escHtml(item.city)+'</div>'+
+      '</div>'+
+      '<div class="salary">'+salary+'</div>'+
+    '</div>'+
+    '<div class="card-meta">'+
+      '<span>📍 '+escHtml(item.city)+'</span>'+
+      '<span>📅 截止 '+deadline+'</span>'+
+      '<span>🎓 '+escHtml(item.education||'本科及以上')+'</span>'+
+      '<span>⏰ '+(item.days_per_week||4)+'天/周</span>'+
+    '</div>'+
+    '<div class="card-bottom">'+
+      '<span>'+(item.view_count||0)+'人已查看</span>'+
+      '<a href="detail.html?id='+item.id+'" class="card-detail-link">查看详情 →</a>'+
+    '</div>'+
+    '</div>';
+}
+
+/* 检查是否是自己的主页 */
+function checkOwnProfile() {
+  const user = Auth.getUser();
+  if (!user || String(user.id) !== String(currentUserId)) {
+    // 别人的主页，隐藏添加偏好输入
+    const addRow = document.querySelector('.pref-add-row');
+    if (addRow) addRow.style.display = 'none';
+    // 隐藏编辑按钮
+    const editBtn = document.querySelector('.btn-edit-profile');
+    if (editBtn) editBtn.style.display = 'none';
+    // 隐藏删除按钮
+    document.querySelectorAll('.pref-tag .remove').forEach(el => el.style.display = 'none');
+    // 隐藏会员相关
+    const memberRow = document.querySelector('.profile-member-row');
+    if (memberRow) memberRow.style.display = 'none';
+    return;
+  }
+  // 自己的主页：显示会员状态
+  updateMemberBadge();
+}
+
+/* 更新会员标识 */
+async function updateMemberBadge() {
+  const badge = document.getElementById('memberBadge');
+  const bindLink = document.getElementById('bindEmailLink');
+  try {
+    const me = await UserAPI.me();
+    if (me.role === 'admin') {
+      badge.textContent = '🛡️ 管理员';
+      badge.style.background = '#dc2626';
+      badge.style.color = '#fff';
+      if (bindLink) bindLink.style.display = 'none';
+    } else if (me.is_member === 1) {
+      badge.textContent = '✨ 会员';
+      badge.style.background = '#4f46e5';
+      badge.style.color = '#fff';
+      if (bindLink) bindLink.style.display = 'none';
+    } else {
+      badge.textContent = '📋 普通用户';
+      badge.style.background = '#f3f4f6';
+      badge.style.color = '#6b7280';
+      if (bindLink) bindLink.style.display = 'inline';
+    }
+  } catch(e) {
+    // 从 localStorage 判断
+    const user = Auth.getUser();
+    if (user && user.role === 'admin') {
+      badge.textContent = '🛡️ 管理员';
+      badge.style.background = '#dc2626';
+      badge.style.color = '#fff';
+    } else if (user && user.is_member === 1) {
+      badge.textContent = '✨ 会员';
+      badge.style.background = '#4f46e5';
+      badge.style.color = '#fff';
+    } else {
+      badge.textContent = '📋 普通用户';
+      badge.style.background = '#f3f4f6';
+      badge.style.color = '#6b7280';
+      if (bindLink) bindLink.style.display = 'inline';
+    }
+  }
+}
+
+function timeAgo(date) {
+  const now = new Date();
+  const diff = now - date;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return '刚刚';
+  if (mins < 60) return mins + '分钟前';
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours + '小时前';
+  const days = Math.floor(hours / 24);
+  if (days < 30) return days + '天前';
+  if (days < 365) return Math.floor(days / 30) + '个月前';
+  return Math.floor(days / 365) + '年前';
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function escJs(s) {
+  return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+</script>
+</body>
+</html>

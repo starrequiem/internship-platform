@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理员登录 | 实习通</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#0f172a;min-height:100vh;display:flex;align-items:center;justify-content:center}
+  .login-box{background:#1e293b;border-radius:16px;padding:48px 40px;width:100%;max-width:400px;box-shadow:0 25px 80px rgba(0,0,0,.5);border:1px solid #334155}
+  .login-box .shield{text-align:center;font-size:48px;margin-bottom:8px}
+  .login-box h1{font-size:20px;font-weight:700;color:#f1f5f9;text-align:center;margin-bottom:6px}
+  .login-box .sub{font-size:13px;color:#64748b;text-align:center;margin-bottom:32px}
+  .login-box label{font-size:12px;font-weight:600;color:#94a3b8;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+  .login-box input{width:100%;padding:12px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#f1f5f9;font-size:14px;font-family:inherit;outline:none;transition:all .2s;margin-bottom:18px}
+  .login-box input:focus{border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,.15)}
+  .login-box input::placeholder{color:#475569}
+  .btn-login{width:100%;padding:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+  .btn-login:hover{opacity:.9;transform:translateY(-1px)}
+  .btn-login:disabled{opacity:.6;cursor:not-allowed}
+  .error{background:rgba(239,68,68,.15);color:#fca5a5;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;border:1px solid rgba(239,68,68,.25)}
+  .error.show{display:block}
+  .back{text-align:center;margin-top:20px;font-size:13px}
+  .back a{color:#64748b;text-decoration:none}
+  .back a:hover{color:#94a3b8}
+</style>
+</head>
+<body>
+
+<div class="login-box">
+  <div class="shield">🛡️</div>
+  <h1>管理员登录</h1>
+  <p class="sub">内部管理系统 · 不对外开放</p>
+
+  <div class="error" id="error">用户名或密码错误</div>
+
+  <label>管理员账号</label>
+  <input type="text" id="username" placeholder="请输入管理员账号" autocomplete="username">
+
+  <label>密码</label>
+  <input type="password" id="password" placeholder="请输入密码" autocomplete="current-password">
+
+  <button class="btn-login" onclick="handleLogin()">🔐 登录管理后台</button>
+
+  <div class="back"><a href="../index.html">← 返回前台</a></div>
+</div>
+
+<script>
+async function handleLogin() {
+  var u = document.getElementById('username').value.trim();
+  var p = document.getElementById('password').value.trim();
+  if (!u || !p) { showError('请填写账号和密码'); return; }
+  var btn = document.querySelector('.btn-login');
+  btn.textContent = '验证中...';
+  btn.disabled = true;
+  try {
+    var resp = await fetch('http://localhost:3000/api/admin/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username: u, password: p})
+    });
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || '登录失败');
+    localStorage.setItem('admin_token', data.token);
+    localStorage.setItem('admin_user', JSON.stringify(data.admin));
+    location.href = 'index.html';
+  } catch(e) {
+    showError(e.message);
+    btn.textContent = '🔐 登录管理后台';
+    btn.disabled = false;
+  }
+}
+function showError(msg) {
+  var el = document.getElementById('error');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 4000);
+}
+document.getElementById('password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') handleLogin();
+});
+</script>
+</body>
+</html>

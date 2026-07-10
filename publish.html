@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>发布实习信息 | 实习通</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 公共顶栏（由 js/components.js 自动加载） -->
+<div data-component="header"></div>
+
+<div class="publish-main">
+
+  <form class="publish-form">
+    <h1>📤 发布实习信息</h1>
+    <p class="subtitle">分享你知道的实习机会，帮助更多同学找到好工作</p>
+
+    <!-- 基本信息 -->
+    <div class="form-section">
+      <h3>基本信息</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 公司名称</label>
+          <input type="text" placeholder="例如：字节跳动">
+        </div>
+        <div class="form-group">
+          <label>公司Logo</label>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div id="logoPreview" style="width:56px;height:56px;border-radius:14px;background:#f3f4f6;border:2px dashed #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:24px;color:#d1d5db;overflow:hidden;flex-shrink:0">🏢</div>
+            <label style="padding:8px 16px;background:#fff;color:#4f46e5;border:1px solid #4f46e5;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit">
+              📷 上传Logo
+              <input type="file" accept="image/*" id="logoFile" style="display:none" onchange="previewLogo(this)">
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 岗位名称</label>
+          <input type="text" placeholder="例如：前端开发实习生">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 工作城市</label>
+          <select>
+            <option value="">请选择</option>
+            <option>北京</option><option>上海</option><option>广州</option>
+            <option>深圳</option><option>杭州</option><option>成都</option>
+            <option>南京</option><option>武汉</option><option>西安</option>
+            <option>苏州</option><option>远程办公</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>详细地址</label>
+          <input type="text" placeholder="例如：海淀区中关村（选填）">
+        </div>
+      </div>
+    </div>
+
+    <!-- 薪资 & 要求 -->
+    <div class="form-section">
+      <h3>薪资与要求</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>薪资范围</label>
+          <input type="text" placeholder="例如：¥400-500/天">
+        </div>
+        <div class="form-group">
+          <label><span class="required">*</span> 学历要求</label>
+          <select>
+            <option value="">请选择</option>
+            <option>不限</option><option>大专及以上</option>
+            <option>本科及以上</option><option>硕士及以上</option>
+            <option>博士</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 每周出勤</label>
+          <select>
+            <option value="">请选择</option>
+            <option>3天/周</option><option>4天/周</option><option>5天/周</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><span class="required">*</span> 实习时长</label>
+          <select>
+            <option value="">请选择</option>
+            <option>1-2个月</option><option>3-4个月</option>
+            <option>5-6个月</option><option>6个月以上</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 投递截止日期</label>
+          <input type="date">
+        </div>
+        <div class="form-group">
+          <label>招聘人数</label>
+          <input type="number" placeholder="人数（选填）" min="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>面向专业</label>
+          <select>
+            <option value="">不限专业</option>
+            <option>计算机/软件</option><option>电子信息/通信</option>
+            <option>人工智能/大数据</option><option>数学/统计</option>
+            <option>经管/金融</option><option>市场营销/广告</option>
+            <option>设计/传媒</option><option>机械/自动化</option>
+            <option>外语/国际贸易</option><option>法学</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>面向年级</label>
+          <select>
+            <option value="">不限</option>
+            <option>2026届</option><option>2027届</option>
+            <option>2028届</option><option>2029届</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 详细描述 -->
+    <div class="form-section">
+      <h3>详细描述</h3>
+      <div class="form-row single">
+        <div class="form-group">
+          <label><span class="required">*</span> 职位描述</label>
+          <textarea placeholder="描述工作内容、你将参与的项目、团队氛围等...&#10;&#10;例如：&#10;• 参与核心业务功能开发&#10;• 与产品设计团队协作&#10;• 参与技术分享与 Code Review"></textarea>
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label><span class="required">*</span> 任职要求</label>
+          <textarea placeholder="描述候选人需要具备的技能和能力...&#10;&#10;例如：&#10;• 熟悉 React/Vue 等主流框架&#10;• 了解 Git 版本控制&#10;• 每周出勤4天以上"></textarea>
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>技术标签</label>
+          <div class="tag-input-wrap">
+            <span class="tag-chip">React <span class="remove">×</span></span>
+            <span class="tag-chip">TypeScript <span class="remove">×</span></span>
+            <input type="text" placeholder="输入标签后回车添加...">
+          </div>
+          <span class="hint">添加岗位相关的技术栈或关键词，帮助同学更快找到</span>
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>其他标签</label>
+          <div class="tag-input-wrap">
+            <span class="tag-chip">有转正机会 <span class="remove">×</span></span>
+            <span class="tag-chip">导师带教 <span class="remove">×</span></span>
+            <input type="text" placeholder="输入标签后回车添加...">
+          </div>
+          <span class="hint">如：免费三餐、健身房、远程面试、可转正等</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 投递方式 -->
+    <div class="form-section">
+      <h3>投递方式</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>投递链接</label>
+          <input type="url" placeholder="https://...（官网投递链接）">
+        </div>
+        <div class="form-group">
+          <label>投递邮箱</label>
+          <input type="email" placeholder="hr@example.com（选填）">
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>是否接受内推</label>
+          <select>
+            <option>我不参与内推，仅分享信息</option>
+            <option>可以帮忙内推（我会联系你）</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="form-actions">
+      <button type="button" class="btn-draft" onclick="saveDraft()" style="display:inline-flex;align-items:center;justify-content:center">💾 保存草稿</button>
+      <button type="submit" class="btn-submit" style="display:inline-flex;align-items:center;justify-content:center">📤 发布实习信息</button>
+    </div>
+
+    <!-- 预览提示 -->
+    <div class="preview-card">
+      <h3>📱 发布后将显示为卡片形式，在其他同学的信息流中展示</h3>
+    </div>
+  </form>
+
+</div>
+
+<script src="js/components.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+// 检查会员权限
+(function checkMemberAccess() {
+  if (!Auth.isLoggedIn()) {
+    location.href = 'login.html?redirect=' + encodeURIComponent(location.href);
+    return;
+  }
+  if (!Auth.isMember()) {
+    location.href = 'bind-email.html?redirect=' + encodeURIComponent(location.href);
+    return;
+  }
+})();
+
+const urlParams = new URLSearchParams(location.search);
+const editId = urlParams.get('edit');
+let isEditMode = !!editId;
+
+// 页面加载时从数据库获取标签建议
+(async function loadTagHints() {
+  try {
+    const tags = await TagAPI.list();
+    // 给技术标签输入框添加 datalist 提示
+    const techInput = document.querySelectorAll('.tag-input-wrap')[0]?.querySelector('input');
+    if (techInput && tags.length) {
+      const dl = document.createElement('datalist');
+      dl.id = 'tech-tag-hints';
+      tags.forEach(t => { const opt = document.createElement('option'); opt.value = t.name; dl.appendChild(opt); });
+      techInput.setAttribute('list', 'tech-tag-hints');
+      techInput.parentNode.appendChild(dl);
+    }
+    const otherInput = document.querySelectorAll('.tag-input-wrap')[1]?.querySelector('input');
+    if (otherInput && tags.length) {
+      const dl = document.createElement('datalist');
+      dl.id = 'other-tag-hints';
+      tags.filter(t => ['可转正','远程办公','导师带教','免费三餐','大厂'].includes(t.name)).forEach(t => { const opt = document.createElement('option'); opt.value = t.name; dl.appendChild(opt); });
+      otherInput.setAttribute('list', 'other-tag-hints');
+      otherInput.parentNode.appendChild(dl);
+    }
+  } catch(_) {}
+})();
+
+// 标签输入交互
+document.querySelectorAll('.tag-input-wrap').forEach(wrap => {
+  const input = wrap.querySelector('input');
+  if (!input) return;
+
+  // 回车添加标签
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && input.value.trim()) {
+      e.preventDefault();
+      addTag(wrap, input.value.trim());
+      input.value = '';
+    }
+    // 退格删除最后一个标签
+    if (e.key === 'Backspace' && !input.value) {
+      const chips = wrap.querySelectorAll('.tag-chip');
+      if (chips.length) chips[chips.length - 1].remove();
+    }
+  });
+
+  // 点击已有标签的 × 删除
+  wrap.addEventListener('click', e => {
+    if (e.target.classList.contains('remove')) {
+      e.target.closest('.tag-chip').remove();
+    }
+  });
+});
+
+function addTag(wrap, text) {
+  const chip = document.createElement('span');
+  chip.className = 'tag-chip';
+  chip.innerHTML = escHtml(text) + ' <span class="remove">×</span>';
+  wrap.insertBefore(chip, wrap.querySelector('input'));
+}
+
+function getTags(wrap) {
+  return Array.from(wrap.querySelectorAll('.tag-chip')).map(c => c.textContent.replace('×','').trim());
+}
+
+// 编辑模式：加载已有数据
+(async function loadEditData() {
+  if (!editId) return;
+  try {
+    const data = await InternAPI.detail(editId);
+    const form = document.querySelector('.publish-form');
+
+    // 修改标题
+    form.querySelector('h1').textContent = '✏️ 编辑实习信息';
+    form.querySelector('.subtitle').textContent = '修改已发布的实习信息，保存后更新修改时间';
+
+    // 填表
+    const inputs = form.querySelectorAll('input, select, textarea');
+    const setVal = (sel, val) => { const el = form.querySelector(sel); if (el) el.value = val || ''; };
+
+    setVal('input[placeholder*="岗位名称"]', data.title);
+    setVal('input[placeholder*="公司名称"]', data.company);
+    // city is select[0]
+    const selects = form.querySelectorAll('select');
+    if (selects[0]) selects[0].value = data.city || '';
+    setVal('input[placeholder*="海淀"]', data.district);
+    setVal('input[placeholder*="薪资"]', data.salary_min ? '¥'+data.salary_min+'-'+data.salary_max+'/天' : '');
+    if (selects[1]) selects[1].value = data.education || '';
+    if (selects[2]) selects[2].value = (data.days_per_week||4)+'天/周';
+    if (selects[3]) selects[3].value = (data.duration_months||3)+'-'+(data.duration_months||3)+'个月';
+    if (selects[4]) selects[4].value = data.deadline || '';
+    setVal('input[type="date"]', data.deadline);
+    setVal('input[type="number"]', data.headcount);
+    if (selects[5]) selects[5].value = data.target_major || '';
+    if (selects[6]) selects[6].value = data.target_grade || '';
+    const textareas = form.querySelectorAll('textarea');
+    if (textareas[0]) textareas[0].value = data.description || '';
+    if (textareas[1]) textareas[1].value = data.requirements || '';
+    setVal('input[type="url"]', data.apply_url);
+    setVal('input[type="email"]', data.apply_email);
+    if (selects[7]) selects[7].value = data.can_refer ? '可以帮忙内推（我会联系你）' : '我不参与内推，仅分享信息';
+
+    // 修改提交按钮
+    const btn = form.querySelector('.btn-submit');
+    btn.textContent = '💾 保存修改';
+  } catch(e) {
+    console.log('加载编辑数据失败：' + e.message);
+  }
+})();
+
+// 表单提交
+document.querySelector('.publish-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const user = Auth.getUser();
+  if (!user) { alert('请先登录再发布实习信息'); location.href = 'login.html?redirect=publish.html'; return; }
+  if (!Auth.isMember()) { alert('请先绑定邮箱升级会员'); location.href = 'bind-email.html?redirect=publish.html'; return; }
+
+  const btn = this.querySelector('.btn-submit');
+  btn.textContent = isEditMode ? '保存中...' : '发布中...';
+  btn.disabled = true;
+
+  try {
+    const techTags = document.querySelectorAll('.tag-input-wrap')[0];
+    const otherTags = document.querySelectorAll('.tag-input-wrap')[1];
+    const allTags = [...getTags(techTags), ...getTags(otherTags)];
+
+    // 上传Logo
+    await uploadLogo();
+
+    const body = {
+      title: this.querySelector('input[placeholder*="岗位名称"]')?.value || '',
+      company: this.querySelector('input[placeholder*="公司名称"]')?.value || '',
+      company_logo: logoUrl || null,
+      city: this.querySelectorAll('select')[0]?.value || '',
+      district: this.querySelector('input[placeholder*="海淀"]')?.value || '',
+      job_type: '技术开发', // 简化处理
+      salary_min: parseSalary(this.querySelector('input[placeholder*="薪资"]')?.value)?.min || null,
+      salary_max: parseSalary(this.querySelector('input[placeholder*="薪资"]')?.value)?.max || null,
+      education: this.querySelectorAll('select')[1]?.value || '',
+      days_per_week: parseInt(this.querySelectorAll('select')[2]?.value) || 4,
+      duration_months: parseInt(this.querySelectorAll('select')[3]?.value) || 3,
+      deadline: this.querySelector('input[type="date"]')?.value || null,
+      headcount: parseInt(this.querySelector('input[type="number"]')?.value) || 1,
+      target_major: this.querySelectorAll('select')[5]?.value || '',
+      target_grade: this.querySelectorAll('select')[6]?.value || '',
+      description: this.querySelectorAll('textarea')[0]?.value || '',
+      requirements: this.querySelectorAll('textarea')[1]?.value || '',
+      apply_url: this.querySelector('input[type="url"]')?.value || '',
+      apply_email: this.querySelector('input[type="email"]')?.value || '',
+      can_refer: (this.querySelectorAll('select')[7]?.value || '').includes('可以'),
+      tags: allTags,
+    };
+
+    if (isEditMode) {
+      await InternAPI.update(editId, body);
+      alert('✅ 修改已保存！');
+      location.href = 'detail.html?id=' + editId;
+    } else {
+      const result = await InternAPI.create(body);
+      alert('✅ 发布成功！');
+      location.href = 'detail.html?id=' + result.id;
+    }
+  } catch(e) {
+    alert((isEditMode ? '保存' : '发布') + '失败：' + e.message + '\n\n（后端未启动时为演示模式）');
+  } finally {
+    btn.textContent = isEditMode ? '💾 保存修改' : '📤 发布实习信息';
+    btn.disabled = false;
+  }
+});
+
+function parseSalary(s) {
+  if (!s) return null;
+  const m = s.match(/(\d+)\s*[-~]\s*(\d+)/);
+  return m ? { min: parseInt(m[1]), max: parseInt(m[2]) } : null;
+}
+
+let logoUrl = '';
+
+function previewLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = document.getElementById('logoPreview');
+    preview.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover">';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadLogo() {
+  const file = document.getElementById('logoFile').files[0];
+  if (!file) return null;
+  try {
+    const result = await uploadFile('logo', file);
+    logoUrl = result.url;
+    return result.url;
+  } catch(e) {
+    console.log('Logo上传失败:', e.message);
+    return null;
+  }
+}
+
+function saveDraft() {
+  const form = document.querySelector('.publish-form');
+  const data = {};
+  form.querySelectorAll('input,select,textarea').forEach(el => {
+    if (el.name || el.placeholder) data[el.name || el.placeholder] = el.value;
+  });
+  localStorage.setItem('draft_internship', JSON.stringify(data));
+  alert('💾 草稿已保存到本地');
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
