@@ -6,6 +6,7 @@ const pool = mysql.createPool({
   password: '200619',
   database: 'internship_platform',
   charset: 'utf8mb4',
+  charsetNumber: 224, // utf8mb4_unicode_ci, 防止中文乱码
   waitForConnections: true,
   connectionLimit: 10,
 });
