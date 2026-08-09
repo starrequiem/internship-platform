@@ -381,16 +381,31 @@ function renderPagination(container, total, page, limit) {
   if (totalPages <= 1) return;
   const pag = document.createElement('div');
   pag.className = 'pagination';
-  pag.innerHTML = '<span class="page-btn">‹</span>';
+
+  function makeBtn(text, targetPage, disabled, isActive) {
+    const btn = document.createElement('span');
+    btn.className = 'page-btn' + (isActive ? ' active' : '');
+    btn.textContent = text;
+    if (disabled) { btn.style.opacity = '0.4'; return btn; }
+    btn.style.cursor = 'pointer';
+    btn.onclick = function() { currentPage = targetPage; loadList(); window.scrollTo({top:0,behavior:'smooth'}); };
+    return btn;
+  }
+
+  pag.appendChild(makeBtn('‹', page - 1, page <= 1, false));
   const maxShow = 5;
   let start = Math.max(1, page - 2);
   let end = Math.min(totalPages, start + maxShow - 1);
   if (end - start < maxShow - 1) start = Math.max(1, end - maxShow + 1);
   for (let i = start; i <= end; i++) {
-    pag.innerHTML += `<span class="page-btn${i === page ? ' active' : ''}">${i}</span>`;
+    pag.appendChild(makeBtn(i, i, false, i === page));
   }
-  if (end < totalPages) pag.innerHTML += '<span class="page-btn">…</span><span class="page-btn">'+totalPages+'</span>';
-  pag.innerHTML += '<span class="page-btn">›</span>';
+  if (end < totalPages) {
+    const dots = document.createElement('span'); dots.className = 'page-btn'; dots.textContent = '…'; dots.style.opacity = '0.4';
+    pag.appendChild(dots);
+    pag.appendChild(makeBtn(totalPages, totalPages, false, false));
+  }
+  pag.appendChild(makeBtn('›', page + 1, page >= totalPages, false));
   container.appendChild(pag);
 }
 

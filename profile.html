@@ -105,12 +105,13 @@ async function loadInternships(uid) {
 
 async function loadFavorites(uid) {
   var grid = document.getElementById('profileGrid');
-  var data = await UserAPI.favorites(uid);
-  if (!data || !data.length) {
+  var result = await UserAPI.favorites(uid);
+  var items = result.data || result || [];
+  if (!items.length) {
     grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">⭐</div><p>还没有收藏过实习信息</p></div>';
     return;
   }
-  grid.innerHTML = data.map(function(item) { return createProfileCard(item); }).join('');
+  grid.innerHTML = items.map(function(item) { return createProfileCard(item); }).join('');
 }
 
 function createProfileCard(item) {

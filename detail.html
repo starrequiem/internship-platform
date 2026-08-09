@@ -226,16 +226,33 @@ async function toggleFav(internId) {
 }
 
 /* ---- 反馈/举报弹窗 ---- */
-function showReportModal(internId) {
-  if (!Auth.isLoggedIn()) { alert('请先登录'); location.href = 'login.html?redirect='+encodeURIComponent(location.href); return; }
-  var modal = document.getElementById('reportModal');
-  if (!modal) { createReportModal(); modal = document.getElementById('reportModal'); }
-  document.getElementById('reportInternId').value = internId;
-  modal.style.display = 'flex';
+var _reportBuilt = false;
+function buildReportModal() {
+  if (_reportBuilt) return;
+  var m = document.createElement('div');
+  m.id = 'reportModal';
+  m.className = 'report-modal-overlay';
+  m.onclick = function(e) { if (e.target === m) closeReportModal(); };
+  m.innerHTML = '<div class="report-modal">' +
+    '<h3>🚩 反馈问题</h3>' +
+    '<p style="font-size:13px;color:#6b7280;margin-bottom:16px">如果发现该实习信息有误、重复或其他问题，请告诉我们</p>' +
+    '<input type="hidden" id="reportInternId">' +
+    '<div style="margin-bottom:12px"><label style="font-size:13px;font-weight:600;color:#374151">问题类型</label>' +
+    '<select id="reportType" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;margin-top:4px">' +
+    '<option value="duplicate">重复信息</option><option value="error">信息有误</option><option value="outdated">已过时/已关闭</option><option value="other">其他问题</option></select></div>' +
+    '<div style="margin-bottom:16px"><label style="font-size:13px;font-weight:600;color:#374151">详细说明</label>' +
+    '<textarea id="reportMsg" maxlength="500" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;resize:vertical;min-height:100px;margin-top:4px"></textarea></div>' +
+    '<div style="display:flex;gap:10px;justify-content:flex-end">' +
+    '<button onclick="closeReportModal()" style="padding:10px 24px;background:#fff;color:#6b7280;border:1px solid #e5e7eb;border-radius:10px;cursor:pointer">取消</button>' +
+    '<button onclick="submitReport()" style="padding:10px 24px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer">提交反馈</button></div></div>';
+  document.body.appendChild(m);
+  _reportBuilt = true;
 }
-function createReportModal() {
-  var html = '<div id="reportModal" class="report-modal-overlay" onclick="if(event.target===this)closeReportModal()"><div class="report-modal"><h3>🚩 反馈问题</h3><p style="font-size:13px;color:#6b7280;margin-bottom:16px">如果发现该实习信息有误、重复或其他问题，请告诉我们</p><div class="form-group" style="margin-bottom:12px"><label style="font-size:13px;font-weight:600;color:#374151">问题类型</label><select id="reportType" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;margin-top:4px"><option value="duplicate">重复信息</option><option value="error">信息有误</option><option value="outdated">已过时/已关闭</option><option value="other">其他问题</option></select></div><div class="form-group" style="margin-bottom:16px"><label style="font-size:13px;font-weight:600;color:#374151">详细说明 <span style="color:#9ca3af;font-weight:400">(必填)</span></label><textarea id="reportMsg" placeholder="请描述具体问题..." maxlength="500" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;resize:vertical;min-height:100px;margin-top:4px"></textarea></div><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="closeReportModal()" style="padding:10px 24px;background:#fff;color:#6b7280;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;cursor:pointer">取消</button><button onclick="submitReport()" style="padding:10px 24px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">提交反馈</button></div></div></div>';
-  document.body.insertAdjacentHTML('beforeend', html);
+function showReportModal(internId) {
+  if (!Auth.isLoggedIn()) { alert('请先登录'); return; }
+  buildReportModal();
+  document.getElementById('reportInternId').value = internId;
+  document.getElementById('reportModal').style.display = 'flex';
 }
 function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
 async function submitReport() {
@@ -254,7 +271,7 @@ async function submitReport() {
   } catch(e) { alert('提交失败：' + e.message); }
 }
 
-function escHtml(s) {
+function escHtmlfunction escHtml(s) {
   if (!s) return '';
   var d = document.createElement('div');
   d.textContent = s;
