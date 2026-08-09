@@ -14,13 +14,10 @@ app.use('/api/internships', require('./routes/internships'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/favorites', require('./routes/favorites'));
 app.use('/api/tags', require('./routes/tags'));
-app.use('/api/subscriptions', require('./routes/subscriptions'));
-app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/applications', require('./routes/applications'));
 app.use('/api/thanks', require('./routes/thanks'));
+app.use('/api/reports', require('./routes/reports'));
 app.use('/api/upload', require('./routes/upload'));
-app.use('/api/users', require('./routes/preferences'));
-app.use('/api/admin', require('./routes/admin'));
 
 // 健康检查
 app.get('/api/health', (req, res) => {

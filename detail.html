@@ -16,7 +16,7 @@
   <!-- 面包屑 -->
   <div class="breadcrumb">
     <a href="index.html">首页</a> &rsaquo;
-    <a href="default.html">技术开发</a> &rsaquo;
+    <a href="search.html?job_type=技术开发">技术开发</a> &rsaquo;
     <span>前端开发实习生</span>
   </div>
 
@@ -56,9 +56,9 @@
         <span class="value">2026届、2027届</span>
       </div>
     </div>
-    <div class="detail-actions">
-      <a href="default.html" class="btn-apply" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">立即投递</a>
-      <a href="default.html" class="btn-save" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">⭐ 收藏</a>
+    <div class="detail-actions" id="detailActions">
+      <a href="#" class="btn-apply" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">立即投递</a>
+      <button class="btn-save">⭐ 收藏</button>
     </div>
   </div>
 
@@ -202,10 +202,17 @@
         <div class="detail-meta-item"><span class="label">⏰ 工作时间</span><span class="value">${item.days_per_week||4}天/周 · ${item.duration_months||3}个月</span></div>
         <div class="detail-meta-item"><span class="label">💼 面向年级</span><span class="value">${escHtml(item.target_grade||'不限')}</span></div>
       </div>
+      <div class="detail-section" style="margin-top:16px">
+        <h2>📬 联系信息</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+          ${item.apply_url ? '<div><span style="color:#9ca3af">🔗 投递链接：</span><a href="'+escHtml(item.apply_url)+'" target="_blank" style="color:#4f46e5;font-weight:600">'+escHtml(item.apply_url)+'</a></div>' : ''}
+          ${item.apply_email ? '<div><span style="color:#9ca3af">📧 投递邮箱：</span><a href="mailto:'+escHtml(item.apply_email)+'" style="color:#4f46e5;font-weight:600">'+escHtml(item.apply_email)+'</a></div>' : ''}
+          <div><span style="color:#9ca3af">🤝 内推状态：</span><span style="font-weight:600;color:#374151">${item.can_refer ? '✅ 可以帮忙内推' : '📋 仅分享信息'}</span></div>
+        </div>
+      </div>
       <div class="detail-actions">
-        <a href="${item.apply_url||'default.html'}" target="_blank" class="btn-apply" onclick="trackApply(${item.id})" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none">立即投递</a>
         <button class="btn-save" id="btnFav" onclick="toggleFav(${item.id})" style="display:inline-flex;align-items:center;justify-content:center">⭐ 收藏</button>
-        <button class="btn-save" id="btnThanks" onclick="sendThanks(${item.id}, ${item.poster_id})" style="display:inline-flex;align-items:center;justify-content:center;background:#fef3c7;border-color:#f59e0b;color:#92400e">👍 感谢分享者</button>
+        <button class="btn-save" id="btnReport" onclick="showReportModal(${item.id})" style="display:inline-flex;align-items:center;justify-content:center;background:#fef2f2;border-color:#ef4444;color:#dc2626;margin-left:auto">🚩 反馈/举报</button>
       </div>`;
 
     // 职位描述
@@ -282,62 +289,64 @@ function createMiniCard(item) {
 }
 
 async function checkFavState(internId) {
-  const user = Auth.getUser();
+  var user = Auth.getUser();
   if (!user) return;
-  try {
-    const res = await FavAPI.check(internId);
-    const btn = document.getElementById('btnFav');
-    if (btn && res.favorited) {
-      btn.textContent = '⭐ 已收藏';
-      btn.style.background = '#eef2ff';
-    }
-  } catch(_) {}
-}
-
-async function toggleFav(internId) {
-  const user = Auth.getUser();
-  if (!user) { alert('请先登录'); location.href = 'login.html?redirect='+encodeURIComponent(location.href); return; }
-  if (!Auth.isMember()) { alert('请先绑定邮箱升级会员'); location.href = 'bind-email.html?redirect='+encodeURIComponent(location.href); return; }
-  const btn = document.getElementById('btnFav');
-  try {
-    const res = await FavAPI.check(internId);
-    if (res.favorited) {
-      await FavAPI.remove(internId);
-      btn.textContent = '⭐ 收藏';
-      btn.style.background = '';
-    } else {
-      await FavAPI.add(internId);
-      btn.textContent = '⭐ 已收藏';
-      btn.style.background = '#eef2ff';
-    }
-  } catch(e) { alert('操作失败：'+e.message); }
-}
-
-async function sendThanks(internId, posterId) {
-  const user = Auth.getUser();
-  if (!user) { alert('请先登录'); location.href = 'login.html?redirect='+encodeURIComponent(location.href); return; }
-  if (!Auth.isMember()) { alert('请先绑定邮箱升级会员'); location.href = 'bind-email.html?redirect='+encodeURIComponent(location.href); return; }
-  const msg = prompt('💬 给分享者留言（选填，最多200字）：');
-  if (msg === null) return; // 取消
-  try {
-    await fetch(API_BASE + '/thanks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Auth.getToken() },
-      body: JSON.stringify({ to_user_id: posterId, internship_id: internId, message: (msg||'').slice(0, 200) })
-    });
-    alert('✅ 感谢已发送！');
-  } catch(e) {
-    alert('发送失败：' + e.message);
+  var res = await FavAPI.check(internId);
+  var btn = document.getElementById('btnFav');
+  if (btn && res.favorited) {
+    btn.textContent = '⭐ 已收藏';
+    btn.style.background = '#eef2ff';
   }
 }
 
-async function trackApply(internId) {
-  try { await AppAPI.apply(internId); } catch(e) { console.log('投递记录:', e.message); }
+async function toggleFav(internId) {
+  var user = Auth.getUser();
+  if (!user) { alert('请先登录'); location.href = 'login.html?redirect='+encodeURIComponent(location.href); return; }
+  var btn = document.getElementById('btnFav');
+  var res = await FavAPI.check(internId);
+  if (res.favorited) {
+    await FavAPI.remove(internId);
+    btn.textContent = '⭐ 收藏';
+    btn.style.background = '';
+  } else {
+    await FavAPI.add(internId);
+    btn.textContent = '⭐ 已收藏';
+    btn.style.background = '#eef2ff';
+  }
+}
+
+/* ---- 反馈/举报弹窗 ---- */
+function showReportModal(internId) {
+  if (!Auth.isLoggedIn()) { alert('请先登录'); location.href = 'login.html?redirect='+encodeURIComponent(location.href); return; }
+  var modal = document.getElementById('reportModal');
+  if (!modal) { createReportModal(); modal = document.getElementById('reportModal'); }
+  document.getElementById('reportInternId').value = internId;
+  modal.style.display = 'flex';
+}
+function createReportModal() {
+  var html = '<div id="reportModal" class="report-modal-overlay" onclick="if(event.target===this)closeReportModal()"><div class="report-modal"><h3>🚩 反馈问题</h3><p style="font-size:13px;color:#6b7280;margin-bottom:16px">如果发现该实习信息有误、重复或其他问题，请告诉我们</p><div class="form-group" style="margin-bottom:12px"><label style="font-size:13px;font-weight:600;color:#374151">问题类型</label><select id="reportType" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;margin-top:4px"><option value="duplicate">重复信息</option><option value="error">信息有误</option><option value="outdated">已过时/已关闭</option><option value="other">其他问题</option></select></div><div class="form-group" style="margin-bottom:16px"><label style="font-size:13px;font-weight:600;color:#374151">详细说明 <span style="color:#9ca3af;font-weight:400">(必填)</span></label><textarea id="reportMsg" placeholder="请描述具体问题..." maxlength="500" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;resize:vertical;min-height:100px;margin-top:4px"></textarea></div><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="closeReportModal()" style="padding:10px 24px;background:#fff;color:#6b7280;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;cursor:pointer">取消</button><button onclick="submitReport()" style="padding:10px 24px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">提交反馈</button></div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
+async function submitReport() {
+  var msg = document.getElementById('reportMsg').value.trim();
+  if (!msg) { alert('请填写详细说明'); return; }
+  try {
+    var resp = await fetch(API_BASE + '/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Auth.getToken() },
+      body: JSON.stringify({ internship_id: parseInt(document.getElementById('reportInternId').value), type: document.getElementById('reportType').value, message: msg })
+    });
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    alert('✅ ' + data.message);
+    closeReportModal();
+  } catch(e) { alert('提交失败：' + e.message); }
 }
 
 function escHtml(s) {
   if (!s) return '';
-  const d = document.createElement('div');
+  var d = document.createElement('div');
   d.textContent = s;
   return d.innerHTML;
 }

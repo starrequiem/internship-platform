@@ -2,17 +2,11 @@ const router = require('express').Router();
 const pool = require('../db');
 const { requireAuth } = require('../middleware/auth');
 
-// POST /api/applications — 记录投递（需登录+会员）
+// POST /api/applications — 记录投递（需登录）
 router.post('/', requireAuth, async (req, res) => {
   try {
     const { internship_id } = req.body;
     if (!internship_id) return res.status(400).json({ error: '缺少 internship_id' });
-
-    // 检查会员权限
-    const [[user]] = await pool.query('SELECT is_member, role FROM users WHERE id = ?', [req.user.id]);
-    if (user.role !== 'admin' && !user.is_member) {
-      return res.status(403).json({ error: '请先绑定邮箱升级会员' });
-    }
 
     try {
       await pool.query(

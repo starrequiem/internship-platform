@@ -66,26 +66,11 @@ const UserAPI = {
   favorites(id) {
     return api(`/users/${id}/favorites`);
   },
-  preferences(id) {
-    return api(`/users/${id}/preferences`);
+  captcha(username) {
+    return api('/users/captcha', { method: 'POST', body: JSON.stringify({ username }) });
   },
-  addPreference(id, tag_name) {
-    return api(`/users/${id}/preferences`, { method: 'POST', body: JSON.stringify({ tag_name }) });
-  },
-  removePreference(id, tagName) {
-    return api(`/users/${id}/preferences/${encodeURIComponent(tagName)}`, { method: 'DELETE' });
-  },
-  sendVerifyCode(email) {
-    return api('/users/bind-email/send-code', { method: 'POST', body: JSON.stringify({ email }) });
-  },
-  verifyEmail(email, code) {
-    return api('/users/bind-email/verify', { method: 'POST', body: JSON.stringify({ email, code }) });
-  },
-  forgotPassword(email, username) {
-    return api('/users/forgot-password', { method: 'POST', body: JSON.stringify({ email, username }) });
-  },
-  resetPassword(email, code, new_password) {
-    return api('/users/reset-password', { method: 'POST', body: JSON.stringify({ email, code, new_password }) });
+  changePassword(old_password, new_password) {
+    return api('/users/password', { method: 'PUT', body: JSON.stringify({ old_password, new_password }) });
   },
 };
 
@@ -104,62 +89,5 @@ const FavAPI = {
 
 /* ---- 标签 ---- */
 const TagAPI = {
-  list() {
-    return api('/tags');
-  },
+  list() { return api('/tags'); },
 };
-
-/* ---- 订阅 ---- */
-const SubAPI = {
-  subscribe(data) {
-    return api('/subscriptions', { method: 'POST', body: JSON.stringify(data) });
-  },
-  list() {
-    return api('/subscriptions');
-  },
-  remove(id) {
-    return api(`/subscriptions/${id}`, { method: 'DELETE' });
-  },
-};
-
-/* ---- 通知 ---- */
-const NotifAPI = {
-  list(unreadOnly) {
-    return api('/notifications' + (unreadOnly ? '?unread_only=1' : ''));
-  },
-  unreadCount() {
-    return api('/notifications/unread-count');
-  },
-  markRead(id) {
-    return api(`/notifications/${id}/read`, { method: 'PUT' });
-  },
-  markAllRead() {
-    return api('/notifications/read-all', { method: 'PUT' });
-  },
-};
-
-/* ---- 投递 ---- */
-const AppAPI = {
-  apply(internship_id) {
-    return api('/applications', { method: 'POST', body: JSON.stringify({ internship_id }) });
-  },
-  list() {
-    return api('/applications');
-  },
-};
-
-/* ---- 文件上传 ---- */
-async function uploadFile(type, file) {
-  const token = localStorage.getItem('token');
-  if (!token) throw new Error('请先登录');
-  const formData = new FormData();
-  formData.append('file', file);
-  const resp = await fetch(`${API_BASE}/upload/${type}`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}` },
-    body: formData,
-  });
-  const data = await resp.json();
-  if (!resp.ok) throw new Error(data.error || '上传失败');
-  return data;
-}

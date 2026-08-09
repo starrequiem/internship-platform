@@ -184,8 +184,7 @@
       </div>
 
       <div class="forgot-row">
-        <label><input type="checkbox"> 记住我</label>
-        <a href="forgot-password.html">忘记密码？</a>
+        <span></span>
       </div>
 
       <button type="submit" class="btn-auth" onclick="handleLogin()">🔑 登录</button>
@@ -201,45 +200,18 @@
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script>
-// 演示账号（后端不可用时使用）
-var DEMO_USERS = {
-  'admin':  { id:1, username:'admin',  email:'admin@shixitong.cn',     school:'实习通官方', major:'--', grade:'--', role:'admin',   is_member:1, email_verified:1 },
-  '张三':   { id:2, username:'张三',   email:'zhangsan@tsinghua.edu.cn', school:'清华大学',   major:'计算机科学与技术', grade:'2026届', role:'student', is_member:1, email_verified:1 },
-  '王同学': { id:3, username:'王同学', email:'wang@zju.edu.cn',         school:'浙江大学',     major:'产品设计',       grade:'2026届', role:'student', is_member:0, email_verified:0 },
-  '陈学长': { id:4, username:'陈学长', email:'chen@hust.edu.cn',        school:'华中科技大学', major:'计算机科学',     grade:'2026届', role:'student', is_member:0, email_verified:0 },
-  '刘学姐': { id:5, username:'刘学姐', email:null,                      school:'上海交通大学', major:'数据科学',       grade:'2026届', role:'student', is_member:0, email_verified:0 },
-};
-var DEMO_PASSWORDS = { 'admin': 'admin123', '张三': '123456', '王同学': '123456', '陈学长': '123456', '刘学姐': '123456' };
-
 async function handleLogin() {
   var u = document.getElementById('username').value.trim();
   var p = document.getElementById('password').value.trim();
-  if (!u || !p) {
-    showError('请填写用户名和密码');
-    return;
-  }
+  if (!u || !p) { showError('请填写用户名和密码'); return; }
   var btn = document.querySelector('.btn-auth');
-  btn.textContent = '登录中...';
-  btn.disabled = true;
-
-  // 先尝试真实 API 登录
+  btn.textContent = '登录中...'; btn.disabled = true;
   try {
     await Auth.login(u, p);
     redirectAfterLogin();
-    return;
   } catch(e) {
-    // API 不可用，尝试演示模式
-    var demoUser = DEMO_USERS[u];
-    if (demoUser && DEMO_PASSWORDS[u] === p) {
-      Auth.setToken('demo-token-' + u + '-' + Date.now());
-      Auth.setUser(demoUser);
-      Auth.updateUI();
-      redirectAfterLogin();
-      return;
-    }
-    showError('登录失败：' + (e.message || '用户名或密码错误'));
-    btn.textContent = '🔑 登录';
-    btn.disabled = false;
+    showError(e.message || '用户名或密码错误');
+    btn.textContent = '🔑 登录'; btn.disabled = false;
   }
 }
 

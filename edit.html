@@ -127,21 +127,10 @@
 <div class="edit-main">
 
   <h1 class="edit-page-title">⚙️ 信息修改</h1>
-  <p class="edit-page-sub">管理你的个人资料和已发布的实习信息</p>
+  <p class="edit-page-sub">管理你的个人资料</p>
 
-  <!-- 会员状态卡片 -->
-  <div class="member-status-card" id="memberStatusCard">
-    <div class="status-info">
-      <h4 id="memberStatusTitle">账号状态</h4>
-      <p id="memberStatusDesc">加载中...</p>
-    </div>
-    <div id="memberStatusAction"></div>
-  </div>
-
-  <!-- Tab 切换 -->
   <div class="edit-tabs">
-    <button class="edit-tab active" data-tab="profile">👤 个人资料</button>
-    <button class="edit-tab" data-tab="internships">📋 我的发布</button>
+    <button class="edit-tab active">👤 个人资料</button>
   </div>
 
   <!-- ===== Tab 1: 个人资料 ===== -->
@@ -199,317 +188,93 @@
       </div>
       <div style="display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap">
         <button type="submit" class="btn-save" onclick="saveProfile()">💾 保存资料</button>
-        <a href="bind-email.html" style="font-size:13px;color:#f59e0b;text-decoration:none;font-weight:500">📧 绑定邮箱</a>
-        <a href="forgot-password.html" style="font-size:13px;color:#6b7280;text-decoration:none;font-weight:500">🔑 修改密码</a>
+        <button type="button" class="btn-save" onclick="showPasswordModal()" style="background:#fff;color:#4f46e5;border:2px solid #4f46e5">🔑 修改密码</button>
       </div>
     </form>
   </div>
 
-  <!-- ===== Tab 2: 我的发布 ===== -->
-  <div class="edit-section" id="section-internships">
-    <h3>我发布的实习</h3>
-    <div id="myInternshipsList"><div class="loading-text">加载中...</div></div>
-  </div>
+  <script src="js/components.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+  (async function init() {
+    if (!Auth.isLoggedIn()) { location.href = 'login.html?redirect=edit.html'; return; }
+    loadProfileForm();
+  })();
 
-</div>
-
-<script src="js/components.js"></script>
-<script src="js/api.js"></script>
-<script src="js/auth.js"></script>
-<script>
-let myInternshipsData = [];
-
-(async function init() {
-  if (!Auth.isLoggedIn()) {
-    location.href = 'login.html?redirect=edit.html';
-    return;
-  }
-
-  // Tab 切换
-  document.querySelectorAll('.edit-tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-      document.querySelectorAll('.edit-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.edit-section').forEach(s => s.classList.remove('active'));
-      this.classList.add('active');
-      document.getElementById('section-' + this.dataset.tab).classList.add('active');
-    });
-  });
-
-  await Promise.all([loadMemberStatus(), loadProfileForm(), loadMyInternships()]);
-})();
-
-/* ---- 会员状态 ---- */
-async function loadMemberStatus() {
-  try {
-    const user = await UserAPI.me();
-    if (user.role === 'admin') {
-      document.getElementById('memberStatusTitle').textContent = '🛡️ 管理员账号';
-      document.getElementById('memberStatusDesc').textContent = '拥有全部权限，无需绑定邮箱';
-      document.getElementById('memberStatusAction').innerHTML = '<span class="member-badge is-member" style="background:#dc2626">🛡️ 管理员</span>';
-      return;
-    }
-    const isMember = user.is_member === 1;
-    document.getElementById('memberStatusTitle').textContent = isMember ? '✨ 会员账号' : '📋 普通账号';
-    document.getElementById('memberStatusDesc').textContent = isMember
-      ? '已绑定邮箱，可发布实习信息、发送感谢评论'
-      : '绑定邮箱后即可升级为会员，解锁发布和评论功能';
-    document.getElementById('memberStatusAction').innerHTML = isMember
-      ? '<span class="member-badge is-member">✅ 已绑定邮箱 · 会员</span>'
-      : '<a href="bind-email.html?redirect=edit.html" class="btn-bind-email">📧 绑定邮箱升级会员 →</a>';
-  } catch(e) {
-    document.getElementById('memberStatusDesc').textContent = '无法获取账号状态';
-  }
-}
-
-/* ---- 加载个人资料表单 ---- */
-async function loadProfileForm() {
-  try {
-    const user = await UserAPI.me();
-    document.getElementById('editSchool').value = user.school || '';
-    document.getElementById('editMajor').value = user.major || '';
-    document.getElementById('editGrade').value = user.grade || '';
-    document.getElementById('editBio').value = user.bio || '';
-    document.getElementById('editEmail').value = user.email || '';
-  } catch(e) {
-    // 从 localStorage 回退
-    const u = Auth.getUser();
-    if (u) {
-      document.getElementById('editSchool').value = u.school || '';
-      document.getElementById('editMajor').value = u.major || '';
-      document.getElementById('editGrade').value = u.grade || '';
-      document.getElementById('editEmail').value = u.email || '';
-    }
-  }
+function loadProfileForm() {
+  var user = Auth.getUser();
+  if (!user) return;
+  document.getElementById('editSchool').value = user.school || '';
+  document.getElementById('editMajor').value = user.major || '';
+  document.getElementById('editGrade').value = user.grade || '';
+  document.getElementById('editBio').value = user.bio || '';
 }
 
 function previewAvatar(input) {
-  const file = input.files[0];
+  var file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
+  var reader = new FileReader();
   reader.onload = function(e) {
-    const preview = document.getElementById('avatarPreview');
+    var preview = document.getElementById('avatarPreview');
     preview.innerHTML = '<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover">';
   };
   reader.readAsDataURL(file);
 }
 
 async function saveProfile() {
-  const btn = document.querySelector('#profileForm .btn-save');
-  btn.textContent = '保存中...';
-  btn.disabled = true;
+  var btn = document.querySelector('#profileForm .btn-save');
+  btn.textContent = '保存中...'; btn.disabled = true;
   try {
-    // 先上传头像
-    const avatarFile = document.getElementById('avatarFile').files[0];
-    if (avatarFile) {
-      try {
-        const result = await uploadFile('avatar', avatarFile);
-        // 更新预览
-        const user = Auth.getUser();
-        if (user) { user.avatar_url = result.url; Auth.setUser(user); }
-      } catch(e) { console.log('头像上传失败:', e.message); }
-    }
-
-    const data = {
+    var data = {
       school: document.getElementById('editSchool').value.trim(),
       major: document.getElementById('editMajor').value,
       grade: document.getElementById('editGrade').value,
-      bio: document.getElementById('editBio').value.trim(),
-      email: document.getElementById('editEmail').value.trim(),
+      bio: document.getElementById('editBio').value.trim()
     };
     await UserAPI.updateProfile(data);
-    const user = Auth.getUser();
+    var user = Auth.getUser();
     if (user) { Object.assign(user, data); Auth.setUser(user); }
     showToast('✅ 个人资料已保存', 'success');
-  } catch(e) {
-    showToast('保存失败：' + e.message, 'error');
-  } finally {
-    btn.textContent = '💾 保存资料';
-    btn.disabled = false;
-  }
+  } catch(e) { showToast('保存失败：' + e.message, 'error'); }
+  finally { btn.textContent = '💾 保存资料'; btn.disabled = false; }
 }
 
-/* ---- 我的发布 ---- */
-async function loadMyInternships() {
-  const user = Auth.getUser();
-  if (!user) return;
+/* ---- 修改密码弹窗 ---- */
+function showPasswordModal() {
+  var modal = document.getElementById('pwdModal');
+  if (!modal) { createPwdModal(); modal = document.getElementById('pwdModal'); }
+  modal.style.display = 'flex';
+}
+function createPwdModal() {
+  var html = '<div id="pwdModal" class="report-modal-overlay" onclick="if(event.target===this)closePwdModal()"><div class="report-modal"><h3>🔑 修改密码</h3><p style="font-size:12px;color:#9ca3af;margin-bottom:16px">每个账号7天内限修改一次</p><div class="form-group" style="margin-bottom:12px"><label style="font-size:13px;font-weight:600">旧密码</label><input type="password" id="pwdOld" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;margin-top:4px"></div><div class="form-group" style="margin-bottom:16px"><label style="font-size:13px;font-weight:600">新密码</label><input type="password" id="pwdNew" placeholder="至少6位" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;margin-top:4px"></div><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="closePwdModal()" style="padding:10px 24px;background:#fff;color:#6b7280;border:1px solid #e5e7eb;border-radius:10px;cursor:pointer">取消</button><button onclick="changePassword()" style="padding:10px 24px;background:#4f46e5;color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer">确认修改</button></div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+function closePwdModal() { document.getElementById('pwdModal').style.display = 'none'; }
+async function changePassword() {
+  var oldPwd = document.getElementById('pwdOld').value;
+  var newPwd = document.getElementById('pwdNew').value;
+  if (!oldPwd || !newPwd) { alert('请填写旧密码和新密码'); return; }
+  if (newPwd.length < 6) { alert('新密码至少6位'); return; }
   try {
-    const data = await UserAPI.internships(user.id);
-    myInternshipsData = data.data || data || [];
-    renderMyInternships();
-  } catch(e) {
-    document.getElementById('myInternshipsList').innerHTML =
-      '<div class="empty-text"><div class="icon">📋</div><p>加载失败，请确认后端已启动</p></div>';
-  }
+    await UserAPI.changePassword(oldPwd, newPwd);
+    alert('✅ 密码已修改（7天后可再次修改）');
+    closePwdModal();
+  } catch(e) { alert('修改失败：' + e.message); }
 }
 
-function renderMyInternships() {
-  const container = document.getElementById('myInternshipsList');
-  if (!myInternshipsData.length) {
-    container.innerHTML = '<div class="empty-text"><div class="icon">📋</div><p>你还没有发布过实习信息</p><a href="publish.html" class="btn-save" style="display:inline-block;margin-top:12px;text-decoration:none">📤 去发布</a></div>';
-    return;
-  }
-
-  container.innerHTML = myInternshipsData.map(item => {
-    const colors = ['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#fa709a,#fee140)'];
-    const bg = colors[item.id % colors.length];
-    const salary = item.salary_min ? '¥'+item.salary_min+'-'+item.salary_max+'/天' : '薪资面议';
-    const created = new Date(item.created_at).toLocaleString('zh-CN');
-    const updated = new Date(item.updated_at).toLocaleString('zh-CN');
-    const isModified = item.updated_at && item.created_at &&
-      new Date(item.updated_at).getTime() - new Date(item.created_at).getTime() > 1000;
-
-    return `
-    <div class="my-internship-card" id="card-${item.id}">
-      <div class="my-card-header">
-        <div>
-          <div class="my-card-title">${escHtml(item.title)}</div>
-          <div class="my-card-company">${escHtml(item.company)} · ${escHtml(item.city)} · ${salary}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="status-badge ${item.status==='active'?'status-active':'status-closed'}">${item.status==='active'?'进行中':'已关闭'}</span>
-        </div>
-      </div>
-      <div class="my-card-meta">
-        <span>📅 发布：${created}</span>
-        ${isModified ? '<span class="modified-badge">✏️ 已编辑 · '+updated+'</span>' : ''}
-        <span>👁 ${item.view_count||0} 次查看</span>
-        <span>⭐ ${item.favorite_count||0} 人收藏</span>
-      </div>
-      <div class="my-card-actions">
-        <button class="btn-sm btn-edit" onclick="toggleEditForm(${item.id})">✏️ 编辑</button>
-        ${item.status==='active' ? `<button class="btn-sm btn-close-intern" onclick="closeInternship(${item.id})">🚫 关闭</button>` : ''}
-      </div>
-      <div class="inline-edit-form" id="editForm-${item.id}">
-        ${buildEditForm(item)}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function buildEditForm(item) {
-  const cityOptions = ['北京','上海','广州','深圳','杭州','成都','南京','武汉','西安','苏州','远程办公']
-    .map(c => `<option value="${c}" ${item.city===c?'selected':''}>${c}</option>`).join('');
-
-  const eduOptions = ['不限','大专及以上','本科及以上','硕士及以上','博士']
-    .map(e => `<option value="${e}" ${item.education===e?'selected':''}>${e}</option>`).join('');
-
-  const daysOptions = [3,4,5].map(d => `<option value="${d}" ${item.days_per_week===d?'selected':''}>${d}天/周</option>`).join('');
-  const durOptions = [1,2,3,4,5,6].map(d => `<option value="${d}" ${item.duration_months===d?'selected':''}>${d}个月</option>`).join('');
-
-  return `
-    <div class="form-row">
-      <div class="form-group"><label>岗位名称</label><input id="et-${item.id}-title" value="${escHtml(item.title||'')}"></div>
-      <div class="form-group"><label>公司名称</label><input id="et-${item.id}-company" value="${escHtml(item.company||'')}"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>城市</label><select id="et-${item.id}-city">${cityOptions}</select></div>
-      <div class="form-group"><label>详细地址</label><input id="et-${item.id}-district" value="${escHtml(item.district||'')}"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>薪资下限</label><input type="number" id="et-${item.id}-min" value="${item.salary_min||''}" placeholder="元/天"></div>
-      <div class="form-group"><label>薪资上限</label><input type="number" id="et-${item.id}-max" value="${item.salary_max||''}" placeholder="元/天"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>学历要求</label><select id="et-${item.id}-edu">${eduOptions}</select></div>
-      <div class="form-group"><label>截止日期</label><input type="date" id="et-${item.id}-deadline" value="${item.deadline||''}"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>每周出勤</label><select id="et-${item.id}-days">${daysOptions}</select></div>
-      <div class="form-group"><label>实习时长</label><select id="et-${item.id}-dur">${durOptions}</select></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>面向专业</label><input id="et-${item.id}-major" value="${escHtml(item.target_major||'')}"></div>
-      <div class="form-group"><label>面向年级</label><input id="et-${item.id}-grade" value="${escHtml(item.target_grade||'')}"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>招聘人数</label><input type="number" id="et-${item.id}-hc" value="${item.headcount||1}" min="1"></div>
-      <div class="form-group"><label>投递邮箱</label><input type="email" id="et-${item.id}-email" value="${escHtml(item.apply_email||'')}"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>投递链接</label><input id="et-${item.id}-url" value="${escHtml(item.apply_url||'')}"></div>
-      <div class="form-group"><label>是否内推</label><select id="et-${item.id}-refer"><option value="0" ${!item.can_refer?'selected':''}>仅分享信息</option><option value="1" ${item.can_refer?'selected':''}>可以内推</option></select></div>
-    </div>
-    <div class="form-row single">
-      <div class="form-group"><label>职位描述</label><textarea id="et-${item.id}-desc">${escHtml(item.description||'')}</textarea></div>
-    </div>
-    <div class="form-row single">
-      <div class="form-group"><label>任职要求</label><textarea id="et-${item.id}-req">${escHtml(item.requirements||'')}</textarea></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn-cancel" onclick="toggleEditForm(${item.id})">取消</button>
-      <button class="btn-save" onclick="saveInternship(${item.id})">💾 保存修改</button>
-    </div>`;
-}
-
-function toggleEditForm(id) {
-  const form = document.getElementById('editForm-' + id);
-  form.classList.toggle('show');
-}
-
-async function saveInternship(id) {
-  const g = (s) => document.getElementById('et-' + id + '-' + s);
-  const btn = g('desc').closest('.inline-edit-form').querySelector('.btn-save');
-  btn.textContent = '保存中...';
-  btn.disabled = true;
-
-  try {
-    const data = {
-      title: g('title').value.trim(),
-      company: g('company').value.trim(),
-      city: g('city').value,
-      district: g('district').value.trim(),
-      job_type: '技术开发',
-      salary_min: parseInt(g('min').value) || null,
-      salary_max: parseInt(g('max').value) || null,
-      education: g('edu').value,
-      days_per_week: parseInt(g('days').value) || 4,
-      duration_months: parseInt(g('dur').value) || 3,
-      deadline: g('deadline').value || null,
-      headcount: parseInt(g('hc').value) || 1,
-      target_major: g('major').value.trim(),
-      target_grade: g('grade').value.trim(),
-      description: g('desc').value.trim(),
-      requirements: g('req').value.trim(),
-      apply_url: g('url').value.trim(),
-      apply_email: g('email').value.trim(),
-      can_refer: g('refer').value === '1',
-    };
-
-    await InternAPI.update(id, data);
-    showToast('✅ 修改已保存', 'success');
-    // 重新加载列表
-    await loadMyInternships();
-  } catch(e) {
-    showToast('保存失败：' + e.message, 'error');
-    btn.textContent = '💾 保存修改';
-    btn.disabled = false;
-  }
-}
-
-async function closeInternship(id) {
-  if (!confirm('确定要关闭这条实习信息吗？关闭后其他人将无法查看。')) return;
-  try {
-    await InternAPI.close(id);
-    showToast('实习信息已关闭', 'success');
-    await loadMyInternships();
-  } catch(e) {
-    showToast('操作失败：' + e.message, 'error');
-  }
-}
-
-/* ---- 工具 ---- */
 function showToast(msg, type) {
-  const t = document.createElement('div');
+  var t = document.createElement('div');
   t.className = 'toast ' + (type||'success');
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2000);
-  setTimeout(() => t.remove(), 2500);
+  setTimeout(function() { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2000);
+  setTimeout(function() { t.remove(); }, 2500);
 }
 
 function escHtml(s) {
   if (!s) return '';
-  const d = document.createElement('div');
+  var d = document.createElement('div');
   d.textContent = s;
   return d.innerHTML;
 }

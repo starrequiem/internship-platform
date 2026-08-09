@@ -20,8 +20,7 @@ CREATE TABLE users (
     bio             VARCHAR(500),
     avatar_url      VARCHAR(500),
     role            VARCHAR(20)  DEFAULT 'student',
-    is_member       TINYINT(1)   DEFAULT 0 COMMENT '是否会员',
-    email_verified  TINYINT(1)   DEFAULT 0 COMMENT '邮箱是否已验证',
+    password_changed_at TIMESTAMP NULL COMMENT '上次修改密码时间',
     created_at      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;

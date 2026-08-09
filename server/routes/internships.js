@@ -96,7 +96,7 @@ router.get('/urgent/list', async (req, res) => {
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT i.*, u.username, u.school, u.avatar_url AS poster_avatar
+      `SELECT i.*, u.username, u.school, u.major, u.avatar_url AS poster_avatar
        FROM internships i JOIN users u ON i.poster_id = u.id
        WHERE i.id = ?`, [req.params.id]
     );
@@ -154,15 +154,20 @@ router.post('/', requireAuth, async (req, res) => {
        apply_url || null, apply_email || null, can_refer ? 1 : 0]
     );
 
-    // 关联标签
+    // 关联标签（支持标签名或ID）
     if (tags && tags.length) {
-      for (const tagId of tags) {
-        await pool.query('INSERT IGNORE INTO internship_tags VALUES (?, ?)', [result.insertId, tagId]);
+      for (const tag of tags) {
+        try {
+          if (typeof tag === 'string') {
+            await pool.query('INSERT IGNORE INTO tags (name) VALUES (?)', [tag]);
+            const [[t]] = await pool.query('SELECT id FROM tags WHERE name = ?', [tag]);
+            if (t) await pool.query('INSERT IGNORE INTO internship_tags VALUES (?, ?)', [result.insertId, t.id]);
+          } else {
+            await pool.query('INSERT IGNORE INTO internship_tags VALUES (?, ?)', [result.insertId, tag]);
+          }
+        } catch (_) { /* 跳过单个标签失败 */ }
       }
     }
-
-    // 异步通知匹配的订阅者（不阻塞响应）
-    notifySubscribers(result.insertId, title, company, city, job_type, target_major).catch(() => {});
 
     res.status(201).json({ id: result.insertId, message: '发布成功' });
   } catch (err) {
@@ -241,31 +246,5 @@ router.put('/:id/close', requireAuth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// 通知订阅者：新实习匹配订阅条件时创建通知
-async function notifySubscribers(internId, title, company, city, jobType, targetMajor) {
-  try {
-    const [subs] = await pool.query('SELECT * FROM subscriptions WHERE is_active = 1');
-    for (const sub of subs) {
-      let match = false;
-      if (sub.keyword && (title.includes(sub.keyword) || company.includes(sub.keyword))) match = true;
-      if (sub.city && city.includes(sub.city)) match = true;
-      if (sub.job_type && sub.job_type === jobType) match = true;
-      if (sub.major && targetMajor && targetMajor.includes(sub.major)) match = true;
-      if (!sub.keyword && !sub.city && !sub.job_type && !sub.major) continue;
-      if (match) {
-        await pool.query(
-          'INSERT INTO notifications (user_id, type, title, content, internship_id) VALUES (?,?,?,?,?)',
-          [sub.user_id, 'subscription',
-           `新实习匹配：${title}`,
-           `${company} 发布了一个${jobType}岗位「${title}」${city ? '，地点' + city : ''}，和你的订阅条件匹配`,
-           internId]
-        );
-      }
-    }
-  } catch (err) {
-    console.error('订阅通知失败:', err.message);
-  }
-}
 
 module.exports = router;
