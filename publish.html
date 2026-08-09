@@ -166,28 +166,16 @@
       </div>
     </div>
 
-    <!-- 投递方式 -->
+    <!-- 联系信息 -->
     <div class="form-section">
-      <h3>投递方式</h3>
+      <h3>联系信息</h3>
       <div class="form-row single">
         <div class="form-group">
-          <label><span class="required">*</span> 原文投递链接</label>
-          <input type="url" id="pApplyUrl" placeholder="粘贴官网招聘页面的完整链接（最重要），如 https://zhaopin.baidu.com/...">
-          <span class="hint">这是同学们投递简历的入口，请务必填写正确</span>
+          <label>联系信息</label>
+          <textarea id="pContactInfo" placeholder="粘贴招聘原文链接、HR邮箱、联系电话等投递方式，方便同学直接投递..." style="min-height:100px"></textarea>
+          <span class="hint">建议至少包含官网招聘链接或HR邮箱，两者都有更好</span>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>备选投递邮箱</label>
-          <input type="email" id="pApplyEmail" placeholder="hr@example.com（选填）">
-        </div>
-        <div class="form-group">
-          <label>内推意愿</label>
-          <select id="pCanRefer">
-            <option value="0">仅分享信息，不参与内推</option>
-            <option value="1">可以帮忙内推</option>
-          </select>
-        </div>
       </div>
     </div>
 
@@ -278,9 +266,7 @@ document.querySelector('.publish-form').addEventListener('submit', async functio
       target_grade: selects[6]?.value || '',
       description: this.querySelectorAll('textarea')[0]?.value || '',
       requirements: this.querySelectorAll('textarea')[1]?.value || '',
-      apply_url: (document.getElementById('pApplyUrl')?.value || '').trim(),
-      apply_email: (document.getElementById('pApplyEmail')?.value || '').trim(),
-      can_refer: document.getElementById('pCanRefer')?.value === '1',
+      contact_info: (document.getElementById('pContactInfo')?.value || '').trim(),
       tags: allTags
     };
 
