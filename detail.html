@@ -106,45 +106,41 @@
         <button class="btn-save" id="btnReport" onclick="showReportModal(${item.id})" style="display:inline-flex;align-items:center;justify-content:center;background:#fef2f2;border-color:#ef4444;color:#dc2626;margin-left:auto">🚩 反馈/举报</button>
       </div>`;
 
-    // 职位描述
+    // 职位描述 — 始终显示（用原始文本分行展示）
     const sections = document.querySelectorAll('.detail-section');
-    if (sections[0]) {
-      if (item.description) {
-        sections[0].querySelector('p').textContent = item.description.split('\n')[0] || item.description;
-        const ul = sections[0].querySelector('ul');
-        const bulletLines = item.description.split('\n').filter(l => l.trim().startsWith('•'));
-        if (ul && bulletLines.length) {
-          ul.innerHTML = bulletLines.map(l => '<li>'+escHtml(l.replace('•','').trim())+'</li>').join('');
-        } else if (ul) {
-          // 展示描述中非首行的内容
-          const rest = item.description.split('\n').slice(1).filter(l => l.trim()).map(l => '<li>'+escHtml(l.trim())+'</li>').join('');
-          ul.innerHTML = rest || '';
+    if (sections[0] && item.description) {
+      var descLines = item.description.split('\n').filter(function(l){ return l.trim(); });
+      var descHtml = '';
+      for (var di = 0; di < descLines.length; di++) {
+        var dl = descLines[di].trim();
+        if (dl.startsWith('•') || dl.startsWith('-') || dl.startsWith('·')) {
+          descHtml += '<li>'+escHtml(dl.replace(/^[•\-·]\s*/, ''))+'</li>';
+        } else if (di === 0) {
+          descHtml += '<p>'+escHtml(dl)+'</p>';
         }
-      } else {
-        sections[0].style.display = 'none';
+      }
+      if (descHtml.indexOf('<li>') >= 0) {
+        sections[0].querySelector('ul').innerHTML = descHtml.match(/<li>.*?<\/li>/g) ? descHtml.match(/<li>.*?<\/li>/g).join('') : '';
+      }
+      if (descHtml.indexOf('<p>') >= 0) {
+        sections[0].querySelector('p').textContent = descLines[0];
       }
     }
-    // 任职要求
+    // 任职要求 — 有数据才显示
     if (sections[1]) {
-      if (item.requirements) {
-        const ul = sections[1].querySelector('ul');
-        if (ul) {
-          const lines = item.requirements.split('\n').filter(l => l.trim());
-          ul.innerHTML = lines.map(l => '<li>'+escHtml(l.trim())+'</li>').join('');
-        }
+      if (item.requirements && item.requirements.trim()) {
+        var reqLines = item.requirements.split('\n').filter(function(l){ return l.trim(); });
+        sections[1].querySelector('ul').innerHTML = reqLines.map(function(l){ return '<li>'+escHtml(l.trim())+'</li>'; }).join('');
       } else {
         sections[1].style.display = 'none';
       }
     }
-    // 标签
+    // 标签 — 有数据才显示
     if (item.tags && item.tags.length) {
-      const tagSection = document.querySelector('.detail-tags');
-      if (tagSection) {
-        tagSection.innerHTML = item.tags.map(t => '<span class="card-tag">'+escHtml(t)+'</span>').join('');
-      }
+      document.querySelector('.detail-tags').innerHTML = item.tags.map(function(t){ return '<span class=\"card-tag\">'+escHtml(t)+'</span>'; }).join('');
     } else {
-      const tagSection = document.querySelector('.detail-section:nth-of-type(3)');
-      if (tagSection) tagSection.style.display = 'none';
+      var ts = document.querySelectorAll('.detail-section')[2];
+      if (ts && ts.querySelector('h2').textContent.indexOf('标签') >= 0) ts.style.display = 'none';
     }
     // 分享者
     const posterSection = document.querySelector('.detail-poster');
