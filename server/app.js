@@ -17,6 +17,7 @@ app.use('/api/tags', require('./routes/tags'));
 app.use('/api/applications', require('./routes/applications'));
 app.use('/api/thanks', require('./routes/thanks'));
 app.use('/api/reports', require('./routes/reports'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api/upload', require('./routes/upload'));
 
 // 健康检查

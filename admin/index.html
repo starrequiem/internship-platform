@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台 | 实习通</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#0f172a;color:#e2e8f0;display:flex;min-height:100vh}
+.sidebar{width:220px;background:#1e293b;border-right:1px solid #334155;padding:24px 0;position:fixed;top:0;bottom:0;left:0}
+.sidebar h2{padding:0 20px 20px;border-bottom:1px solid #334155;font-size:18px;color:#f1f5f9}
+.sidebar h2 span{color:#818cf8}
+.sidebar a{display:flex;align-items:center;gap:8px;padding:10px 20px;color:#94a3b8;text-decoration:none;font-size:14px;cursor:pointer}
+.sidebar a:hover,.sidebar a.active{background:#334155;color:#f1f5f9}
+.main{margin-left:220px;flex:1;padding:32px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.stat{background:#1e293b;border-radius:12px;padding:20px;text-align:center}
+.stat .num{font-size:32px;font-weight:800;color:#f1f5f9}
+.stat .lbl{font-size:12px;color:#64748b;margin-top:4px}
+table{width:100%;border-collapse:collapse;background:#1e293b;border-radius:12px;overflow:hidden}
+th{text-align:left;padding:12px 16px;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;background:rgba(15,23,42,.5)}
+td{padding:10px 16px;font-size:13px;color:#cbd5e1;border-bottom:1px solid #1e293b;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:hover td{background:rgba(99,102,241,.05)}
+.btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-primary{background:#4f46e5;color:#fff;margin-right:8px}
+.btn-primary:hover{background:#4338ca}
+.expired td{background:rgba(239,68,68,.05)}
+.login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a}
+.login-box{background:#1e293b;border-radius:16px;padding:40px;width:360px;text-align:center}
+.login-box h2{font-size:22px;margin-bottom:8px;color:#f1f5f9}
+.login-box p{font-size:13px;color:#64748b;margin-bottom:24px}
+.login-box input{width:100%;padding:12px 16px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:15px;margin-bottom:12px;outline:none}
+.login-box input:focus{border-color:#818cf8}
+.login-box button{width:100%;padding:12px;background:#4f46e5;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.login-box button:hover{background:#4338ca}
+.error{color:#f87171;font-size:13px;margin-bottom:12px;display:none}
+.hidden{display:none}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;font-size:14px;z-index:999;background:#065f46;color:#fff}
+</style>
+</head>
+<body>
+
+<!-- 登录页 -->
+<div id="loginPage" class="login-page">
+  <div class="login-box">
+    <h2>🛡️ 实习通管理后台</h2>
+    <p>请使用管理员账号登录</p>
+    <div class="error" id="loginError">登录失败</div>
+    <input type="text" id="adminUser" placeholder="用户名" autocomplete="off">
+    <input type="password" id="adminPass" placeholder="密码">
+    <button onclick="doAdminLogin()">登录</button>
+  </div>
+</div>
+
+<!-- 管理面板 -->
+<div id="adminPanel" class="hidden" style="display:flex">
+  <div class="sidebar">
+    <h2>实习<span style="color:#818cf8">通</span></h2>
+    <a class="active" onclick="showTab('dashboard',this)">📊 仪表盘</a>
+    <a onclick="showTab('internships',this)">📋 实习管理</a>
+    <a onclick="showTab('users',this)">👥 用户管理</a>
+    <a onclick="doAdminLogout()" style="color:#f87171;margin-top:auto">🚪 退出</a>
+  </div>
+  <div class="main" id="mainContent"></div>
+</div>
+
+<script>
+const API = 'http://localhost:3000/api/admin';
+var token = localStorage.getItem('admin_token');
+
+if (token) { checkToken(); }
+
+async function doAdminLogin() {
+  var u = document.getElementById('adminUser').value.trim();
+  var p = document.getElementById('adminPass').value;
+  try {
+    var resp = await fetch(API + '/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username:u, password:p})
+    });
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    localStorage.setItem('admin_token', data.token);
+    token = data.token;
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('adminPanel').style.display = 'flex';
+    showTab('dashboard');
+  } catch(e) {
+    document.getElementById('loginError').textContent = e.message;
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+async function checkToken() {
+  try {
+    var resp = await fetch(API + '/stats', {headers:{'Authorization':'Bearer '+token}});
+    if (resp.ok) {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('adminPanel').style.display = 'flex';
+      showTab('dashboard');
+    } else { localStorage.removeItem('admin_token'); token = null; }
+  } catch(e) {}
+}
+
+function doAdminLogout() {
+  localStorage.removeItem('admin_token');
+  token = null;
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('adminPanel').style.display = 'none';
+}
+
+function showTab(tab, el) {
+  document.querySelectorAll('.sidebar a').forEach(function(a){a.classList.remove('active')});
+  if (el) el.classList.add('active');
+  if (tab === 'dashboard') loadDashboard();
+  else if (tab === 'internships') loadInternships();
+  else if (tab === 'users') loadUsers();
+}
+
+async function api(path, method, body) {
+  var opts = {method:method||'GET', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}};
+  if (body) opts.body = JSON.stringify(body);
+  var resp = await fetch(API + path, opts);
+  var data = await resp.json();
+  if (!resp.ok) throw new Error(data.error);
+  return data;
+}
+
+async function loadDashboard() {
+  var stats = await api('/stats');
+  document.getElementById('mainContent').innerHTML =
+    '<h2 style="margin-bottom:24px">📊 仪表盘</h2>' +
+    '<div class="stats">' +
+      '<div class="stat"><div class="num">'+stats.active+'</div><div class="lbl">活跃实习</div></div>' +
+      '<div class="stat"><div class="num" style="color:'+(stats.expired>0?'#f87171':'#4ade80')+'">'+stats.expired+'</div><div class="lbl">已截止未下架</div></div>' +
+      '<div class="stat"><div class="num">'+stats.today_new+'</div><div class="lbl">今日新增</div></div>' +
+      '<div class="stat"><div class="num">'+stats.total_internships+'</div><div class="lbl">总实习</div></div>' +
+      '<div class="stat"><div class="num">'+stats.total_users+'</div><div class="lbl">用户数</div></div>' +
+    '</div>' +
+    (stats.expired > 0 ? '<button class="btn btn-danger" onclick="closeExpired()" style="font-size:14px;padding:10px 20px">🚫 一键下架 '+stats.expired+' 条已截止</button>' : '');
+}
+
+async function closeExpired() {
+  if (!confirm('确定关闭所有已截止的实习？')) return;
+  var r = await api('/internships/close-expired', 'POST');
+  alert(r.message);
+  loadDashboard();
+}
+
+async function loadInternships() {
+  var rows = await api('/internships');
+  var today = new Date().toISOString().slice(0,10);
+  var html = '<h2 style="margin-bottom:16px">📋 实习管理 ('+rows.length+'条)</h2>' +
+    '<button class="btn btn-danger" onclick="closeExpired()" style="margin-bottom:16px;font-size:14px;padding:8px 16px">🚫 一键下架已截止实习</button>' +
+    '<div style="overflow-x:auto"><table><tr><th>ID</th><th>状态</th><th>岗位</th><th>公司</th><th>城市</th><th>截止日期</th><th>联系信息</th><th>操作</th></tr>';
+  rows.forEach(function(r){
+    var isExpired = r.deadline && r.deadline < today && r.status === 'active';
+    html += '<tr class="'+(isExpired?'expired':'')+'">' +
+      '<td>'+r.id+'</td>' +
+      '<td>'+(r.status==='active'?'<span style="color:#4ade80">进行中</span>':'<span style="color:#f87171">已关闭</span>')+'</td>' +
+      '<td title="'+(r.title||'')+'">'+(r.title||'?').slice(0,20)+'</td>' +
+      '<td>'+(r.company||'?').slice(0,12)+'</td>' +
+      '<td>'+(r.city||'?')+'</td>' +
+      '<td style="color:'+(isExpired?'#f87171':'#94a3b8')+'">'+(r.deadline||'无')+(isExpired?' ⚠️':'')+'</td>' +
+      '<td>'+(r.contact_info||'无').slice(0,30)+'</td>' +
+      '<td><button class="btn btn-danger" onclick="deleteIntern('+r.id+')">删除</button></td>' +
+    '</tr>';
+  });
+  html += '</table></div>';
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+async function deleteIntern(id) {
+  if (!confirm('确定删除 #'+id+'？')) return;
+  await api('/internships/'+id, 'DELETE');
+  alert('已删除');
+  loadInternships();
+}
+
+async function loadUsers() {
+  var rows = await api('/users');
+  var html = '<h2 style="margin-bottom:16px">👥 用户管理 ('+rows.length+'人)</h2>' +
+    '<table><tr><th>ID</th><th>用户名</th><th>学校</th><th>角色</th><th>分享数</th><th>注册时间</th></tr>';
+  rows.forEach(function(r){
+    html += '<tr><td>'+r.id+'</td><td>'+r.username+'</td><td>'+(r.school||'')+'</td><td>'+r.role+'</td><td>'+r.share_count+'</td><td>'+new Date(r.created_at).toLocaleDateString()+'</td></tr>';
+  });
+  html += '</table>';
+  document.getElementById('mainContent').innerHTML = html;
+}
+</script>
+</body>
+</html>
