@@ -191,19 +191,24 @@ async function checkFavState(internId) {
 }
 
 async function toggleFav(internId) {
-  var user = Auth.getUser();
-  if (!user) { alert('请先登录'); location.href = 'login.html?redirect='+encodeURIComponent(location.href); return; }
-  var btn = document.getElementById('btnFav');
-  var res = await FavAPI.check(internId);
-  if (res.favorited) {
-    await FavAPI.remove(internId);
-    btn.textContent = '⭐ 收藏';
-    btn.style.background = '';
-  } else {
-    await FavAPI.add(internId);
-    btn.textContent = '⭐ 已收藏';
-    btn.style.background = '#eef2ff';
-  }
+  try {
+    var user = Auth.getUser();
+    if (!user) { alert('请先登录'); location.href = 'login.html?redirect='+encodeURIComponent(location.href); return; }
+    var btn = document.getElementById('btnFav');
+    if (!btn) { console.error('btnFav not found'); return; }
+    btn.textContent = '...'; btn.disabled = true;
+    var res = await FavAPI.check(internId);
+    if (res.favorited) {
+      await FavAPI.remove(internId);
+      btn.textContent = '⭐ 收藏';
+      btn.style.background = '';
+    } else {
+      await FavAPI.add(internId);
+      btn.textContent = '⭐ 已收藏';
+      btn.style.background = '#eef2ff';
+    }
+  } catch(e) { alert('操作失败：' + e.message); }
+  finally { var b = document.getElementById('btnFav'); if (b) b.disabled = false; }
 }
 
 /* ---- 反馈/举报弹窗 ---- */
