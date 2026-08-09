@@ -268,29 +268,6 @@
       </div>
     </div>
 
-    <!-- 订阅 -->
-    <div class="widget" id="subscribeWidget">
-      <h3>📬 订阅新分享</h3>
-      <div id="subscribeLoginPrompt" style="text-align:center;padding:16px;color:#9ca3af;font-size:13px">
-        <a href="login.html" style="color:#4f46e5;font-weight:600;text-decoration:none">登录</a>后可订阅，匹配的实习发布时第一时间通知你
-      </div>
-      <div id="subscribeForm" style="display:none">
-        <div class="subscribe-box" style="text-align:left">
-          <input type="text" id="subKeyword" placeholder="关键词（岗位/公司名）" style="margin-bottom:8px">
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <select id="subCity" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px">
-              <option value="">不限城市</option><option>北京</option><option>上海</option><option>广州</option><option>深圳</option><option>杭州</option><option>成都</option>
-            </select>
-            <select id="subJobType" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px">
-              <option value="">不限岗位</option><option>技术开发</option><option>产品经理</option><option>数据分析</option><option>运营</option>
-            </select>
-          </div>
-          <button onclick="doSubscribe()">📬 立即订阅</button>
-        </div>
-        <div id="mySubs" style="margin-top:12px"></div>
-      </div>
-    </div>
-
   </aside>
   <!-- ===== 侧边栏结束 ===== -->
 
@@ -466,50 +443,6 @@ function timeAgo(dateStr) {
   return Math.floor(days / 30) + '个月前';
 }
 
-/* ---- 订阅组件 ---- */
-document.addEventListener('components-loaded', initSubscribe);
-function initSubscribe() {
-  if (Auth.isLoggedIn()) {
-    document.getElementById('subscribeLoginPrompt').style.display = 'none';
-    document.getElementById('subscribeForm').style.display = '';
-    loadMySubs();
-  }
-}
-
-async function doSubscribe() {
-  if (!Auth.isLoggedIn()) { location.href = 'login.html'; return; }
-  var data = {
-    keyword: document.getElementById('subKeyword').value.trim() || null,
-    city: document.getElementById('subCity').value || null,
-    job_type: document.getElementById('subJobType').value || null,
-  };
-  if (!data.keyword && !data.city && !data.job_type) { alert('请至少填写一个订阅条件'); return; }
-  try {
-    await SubAPI.subscribe(data);
-    document.getElementById('subKeyword').value = '';
-    alert('✅ 订阅成功！');
-    loadMySubs();
-  } catch(e) { alert('订阅失败：' + e.message); }
-}
-
-async function loadMySubs() {
-  try {
-    var subs = await SubAPI.list();
-    var container = document.getElementById('mySubs');
-    if (!subs || !subs.length) { container.innerHTML = '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:8px">暂无订阅</div>'; return; }
-    container.innerHTML = '<div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px">我的订阅：</div>' +
-      subs.map(function(s) {
-        var parts = [s.keyword, s.city, s.job_type].filter(Boolean);
-        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f9fafb;border-radius:8px;margin-bottom:4px;font-size:12px">'+
-          '<span>🔔 '+escHtml(parts.join(' · ')||'全部')+'</span>'+
-          '<span style="color:#ef4444;cursor:pointer;font-weight:600" onclick="cancelSub('+s.id+')">取消</span></div>';
-      }).join('');
-  } catch(e) {}
-}
-
-async function cancelSub(id) {
-  try { await SubAPI.remove(id); loadMySubs(); } catch(e) { alert('取消失败') }
-}
 function escHtml(s) { if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML }
 </script>
 </body>
