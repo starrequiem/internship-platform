@@ -306,7 +306,7 @@ async function loadList() {
   var ct = document.getElementById('idxCity').value;
   var mj = document.getElementById('idxMajor').value;
   try {
-    var result = await InternAPI.list({ job_type: jt||undefined, city: ct||undefined, major: mj||undefined, sort: currentSort, page: currentPage, limit: 20 });
+    var result = await InternAPI.list({ job_type: jt||undefined, city: ct||undefined, major: mj||undefined, sort: currentSort, page: currentPage, limit: 6 });
     if (!result.data || !result.data.length) { showEmpty(); return; }
     var container = document.querySelector('.content');
     container.querySelectorAll('.card,.pagination,.empty-state').forEach(function(c) { c.remove(); });

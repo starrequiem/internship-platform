@@ -108,21 +108,32 @@
 
     // 职位描述
     const sections = document.querySelectorAll('.detail-section');
-    if (sections[0] && item.description) {
-      sections[0].querySelector('p').textContent = item.description.split('\n')[0] || item.description;
-      const ul = sections[0].querySelector('ul');
-      if (ul && item.description) {
-        const lines = item.description.split('\n').filter(l => l.trim().startsWith('•'));
-        ul.innerHTML = lines.map(l => '<li>'+escHtml(l.replace('•','').trim())+'</li>').join('');
+    if (sections[0]) {
+      if (item.description) {
+        sections[0].querySelector('p').textContent = item.description.split('\n')[0] || item.description;
+        const ul = sections[0].querySelector('ul');
+        const bulletLines = item.description.split('\n').filter(l => l.trim().startsWith('•'));
+        if (ul && bulletLines.length) {
+          ul.innerHTML = bulletLines.map(l => '<li>'+escHtml(l.replace('•','').trim())+'</li>').join('');
+        } else if (ul) {
+          // 展示描述中非首行的内容
+          const rest = item.description.split('\n').slice(1).filter(l => l.trim()).map(l => '<li>'+escHtml(l.trim())+'</li>').join('');
+          ul.innerHTML = rest || '';
+        }
+      } else {
+        sections[0].style.display = 'none';
       }
     }
     // 任职要求
-    if (sections[1] && item.requirements) {
-      const ul = sections[1].querySelector('ul');
-      if (ul) {
-        const lines = item.requirements.split('\n').filter(l => l.trim().startsWith('•'));
-        ul.innerHTML = lines.map(l => '<li>'+escHtml(l.replace('•','').trim())+'</li>').join('') ||
-          item.requirements.split('\n').filter(l => l.trim()).map(l => '<li>'+escHtml(l.trim())+'</li>').join('');
+    if (sections[1]) {
+      if (item.requirements) {
+        const ul = sections[1].querySelector('ul');
+        if (ul) {
+          const lines = item.requirements.split('\n').filter(l => l.trim());
+          ul.innerHTML = lines.map(l => '<li>'+escHtml(l.trim())+'</li>').join('');
+        }
+      } else {
+        sections[1].style.display = 'none';
       }
     }
     // 标签
@@ -131,6 +142,9 @@
       if (tagSection) {
         tagSection.innerHTML = item.tags.map(t => '<span class="card-tag">'+escHtml(t)+'</span>').join('');
       }
+    } else {
+      const tagSection = document.querySelector('.detail-section:nth-of-type(3)');
+      if (tagSection) tagSection.style.display = 'none';
     }
     // 分享者
     const posterSection = document.querySelector('.detail-poster');
