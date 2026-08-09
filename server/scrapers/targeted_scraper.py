@@ -18,27 +18,36 @@ def scrape_nowcoder():
         try:
             page.goto('https://www.nowcoder.com/jobs/intern/center?recruitType=2',
                       wait_until='networkidle', timeout=60000)
-            page.wait_for_timeout(5000)  # extra wait for dynamic content
+            page.wait_for_timeout(5000)
 
-            # Try to wait for job cards
-            selectors = [
-                '.job-list-item', '.recruit-item', '[class*="job"]',
-                '[class*="recruit"]', 'li', '.list-item'
-            ]
             content = page.content()
-            print(f'  Page: {len(content)} chars')
-
-            # Extract all text content
             body_text = page.locator('body').inner_text()
-            print(f'  Body text: {len(body_text)} chars')
+            print(f'  Page: {len(content)} chars, Body: {len(body_text)} chars')
 
-            # Try to extract job items by looking for patterns
-            # Look for company names in the text
+            # 提取每个岗位的链接
+            job_links = []
+            try:
+                # 牛客网岗位链接格式: /jobs/intern/detail?jobId=XXXXX
+                links = page.locator('a[href*="/jobs/intern/detail"]').all()
+                for link in links:
+                    try:
+                        href = link.get_attribute('href')
+                        text = link.inner_text().strip()[:80] if link.inner_text() else ''
+                        if href and '/jobs/intern/detail' in href:
+                            full_url = 'https://www.nowcoder.com' + href if href.startswith('/') else href
+                            job_links.append({'title': text, 'url': full_url})
+                    except:
+                        pass
+                print(f'  Extracted {len(job_links)} job links')
+            except Exception as e:
+                print(f'  Link extraction warning: {e}')
+
             results.append({
                 'site': 'Nowcoder',
                 'url': page.url,
                 'items': [],
                 'raw_text': body_text[:50000],
+                'job_links': job_links,  # 每个岗位的链接
                 'status': 'fulltext',
             })
 

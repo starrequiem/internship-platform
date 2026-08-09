@@ -162,11 +162,35 @@ if __name__ == '__main__':
 
         text = data.get('raw_text', '')
         source_url = data.get('url', '')
+        job_links = data.get('job_links', [])
         items = parse_nowcoder_text(text)
-        # Inject source_url into each item for contact_info fallback
+
+        # 匹配 job_links 到每个 item（按标题相似度）
         for item in items:
-            if not item.get('url'):
+            item_title = (item.get('title') or '').lower()
+            best_url = ''
+            # 精确匹配
+            for jl in job_links:
+                if item_title and jl.get('title', '').lower()[:10] == item_title[:10]:
+                    best_url = jl.get('url', '')
+                    break
+            # 模糊匹配
+            if not best_url:
+                for jl in job_links:
+                    jl_title = jl.get('title', '').lower()
+                    if item_title and jl_title and (
+                        item_title[:6] in jl_title or jl_title[:6] in item_title
+                    ):
+                        best_url = jl.get('url', '')
+                        break
+
+            if best_url:
+                item['url'] = best_url
+            elif not item.get('source_url'):
                 item['source_url'] = source_url
+            else:
+                item['source_url'] = source_url
+
         data['items'] = items
         data['status'] = 'parsed'
 
