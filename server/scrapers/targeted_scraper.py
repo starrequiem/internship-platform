@@ -1,14 +1,16 @@
 """
-针对性抓取 - 用 Playwright 等待 SPA 内容加载后再提取
+针对性抓取 - Playwright 动态页面
 """
-import json, os, time
+import json, os, time, sys, io
+# 强制 UTF-8 输出，防止 Windows GBK 乱码
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 from playwright.sync_api import sync_playwright
 
 OUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'scraped_data', 'targeted')
 os.makedirs(OUT_DIR, exist_ok=True)
 
 def scrape_nowcoder():
-    """牛客网 - 等待职位列表加载"""
+    """牛客网 - 提取岗位列表+详情链接"""
     print('\n[NOWCODER] Starting...')
     results = []
     with sync_playwright() as p:
@@ -17,37 +19,38 @@ def scrape_nowcoder():
 
         try:
             page.goto('https://www.nowcoder.com/jobs/intern/center?recruitType=2',
-                      wait_until='networkidle', timeout=60000)
-            page.wait_for_timeout(5000)
+                      wait_until='networkidle', timeout=90000)
+            page.wait_for_timeout(10000)
 
-            content = page.content()
+            # 用JS在页面内提取所有带链接的岗位
+            job_links = page.evaluate('''() => {
+                const results = [];
+                const seen = new Set();
+                // 找所有包含 jobId 或 /detail 的链接
+                document.querySelectorAll('a[href]').forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (href && (href.includes('jobId') || href.includes('/detail'))) {
+                        const text = (a.innerText || '').trim().slice(0, 100);
+                        if (!seen.has(href)) {
+                            seen.add(href);
+                            const url = href.startsWith('http') ? href : 'https://www.nowcoder.com' + href;
+                            results.push({title: text, url: url});
+                        }
+                    }
+                });
+                return results;
+            }''')
+            print(f'  Job links found: {len(job_links)}')
+
             body_text = page.locator('body').inner_text()
-            print(f'  Page: {len(content)} chars, Body: {len(body_text)} chars')
-
-            # 提取每个岗位的链接
-            job_links = []
-            try:
-                # 牛客网岗位链接格式: /jobs/intern/detail?jobId=XXXXX
-                links = page.locator('a[href*="/jobs/intern/detail"]').all()
-                for link in links:
-                    try:
-                        href = link.get_attribute('href')
-                        text = link.inner_text().strip()[:80] if link.inner_text() else ''
-                        if href and '/jobs/intern/detail' in href:
-                            full_url = 'https://www.nowcoder.com' + href if href.startswith('/') else href
-                            job_links.append({'title': text, 'url': full_url})
-                    except:
-                        pass
-                print(f'  Extracted {len(job_links)} job links')
-            except Exception as e:
-                print(f'  Link extraction warning: {e}')
+            print(f'  Body text: {len(body_text)} chars')
 
             results.append({
                 'site': 'Nowcoder',
                 'url': page.url,
                 'items': [],
                 'raw_text': body_text[:50000],
-                'job_links': job_links,  # 每个岗位的链接
+                'job_links': job_links,
                 'status': 'fulltext',
             })
 
@@ -57,35 +60,47 @@ def scrape_nowcoder():
         finally:
             browser.close()
 
-    # Save
     fname = os.path.join(OUT_DIR, f'nowcoder_{int(time.time())}.json')
     with open(fname, 'w', encoding='utf-8') as f:
         json.dump(results[0], f, ensure_ascii=False, indent=2)
-    print(f'  Saved: {fname} ({len(results[0].get("raw_text",""))} chars)')
+    print(f'  Saved: {fname}')
     return results
 
+
 def scrape_xybsyw():
-    """应届生求职网/校友帮"""
+    """应届生求职网"""
     print('\n[XYBSYW] Starting...')
     results = []
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={'width': 375, 'height': 812})  # mobile view
+        page = browser.new_page(viewport={'width': 375, 'height': 812})
 
         try:
             page.goto('https://m.xybsyw.com/page/student.html',
                       wait_until='networkidle', timeout=60000)
             page.wait_for_timeout(5000)
 
-            content = page.content()
             body_text = page.locator('body').inner_text()
-            print(f'  Page: {len(content)} chars, Body: {len(body_text)} chars')
+
+            # 提取链接
+            job_links = page.evaluate('''() => {
+                const results = [];
+                document.querySelectorAll('a[href]').forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (href && (href.includes('job') || href.includes('detail') || href.includes('position'))) {
+                        results.push({title: (a.innerText||'').trim().slice(0,100), url: href});
+                    }
+                });
+                return results;
+            }''')
+            print(f'  Job links: {len(job_links)}, Body: {len(body_text)} chars')
 
             results.append({
                 'site': 'XYBSYW',
                 'url': page.url,
                 'items': [],
-                'raw_text': body_text[:50000] or content[:50000],
+                'raw_text': body_text[:50000] or page.content()[:50000],
+                'job_links': job_links,
                 'status': 'fulltext',
             })
         except Exception as e:
@@ -97,10 +112,10 @@ def scrape_xybsyw():
     fname = os.path.join(OUT_DIR, f'xybsyw_{int(time.time())}.json')
     with open(fname, 'w', encoding='utf-8') as f:
         json.dump(results[0], f, ensure_ascii=False, indent=2)
-    print(f'  Saved: {fname} ({len(results[0].get("raw_text",""))} chars)')
+    print(f'  Saved: {fname}')
     return results
+
 
 if __name__ == '__main__':
     scrape_nowcoder()
     scrape_xybsyw()
-    print('\nDone!')
