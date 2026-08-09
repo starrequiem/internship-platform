@@ -93,14 +93,13 @@ def parse_from_links(job_links, source_url=''):
                 city = c
                 break
 
-        # 提取公司（从剩余行中找）
+        # 提取公司（从所有行中找，包括第一行）
         company = ''
-        for line in lines[1:]:
-            for comp in COMPANIES:
-                if comp in line.strip():
-                    company = comp
-                    break
-            if company: break
+        all_text = title_text
+        for comp in sorted(COMPANIES, key=len, reverse=True):  # 优先匹配长公司名
+            if comp in all_text:
+                company = comp
+                break
 
         # 提取每周天数
         days = 4

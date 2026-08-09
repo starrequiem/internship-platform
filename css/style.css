@@ -305,3 +305,8 @@ body{font-family:'PingFang SC','Microsoft YaHei','Helvetica Neue',sans-serif;bac
 .empty-state{text-align:center;padding:80px 20px;color:#9ca3af}
 .empty-state .icon{font-size:64px;margin-bottom:16px}
 .empty-state p{font-size:15px}
+
+/* --- 弹窗 --- */
+.report-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center}
+.report-modal{background:#fff;border-radius:16px;padding:32px;width:100%;max-width:460px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
