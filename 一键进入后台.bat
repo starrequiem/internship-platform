@@ -1,20 +1,20 @@
 @echo off
-chcp 65001 >nul 2>&1
-title å®ä¹ é€š Â· ç®¡ç†åå°å…¥å£
+chcp 936 >nul 2>&1
+title ÊµÏ°Í¨ - ¹ÜÀíºóÌ¨Èë¿Ú
 
 echo ========================================
-echo   å®ä¹ é€š Â· è¿›å…¥ç®¡ç†åå°
+echo   ÊµÏ°Í¨ - ½øÈë¹ÜÀíºóÌ¨
 echo ========================================
 echo.
 
-echo   æ­£åœ¨æ‰“å¼€ç®¡ç†åå°...
-echo   åœ°å€: http://localhost:8080/admin/index.html
-echo   è´¦å·: admin / admin123
+echo   ÕıÔÚ´ò¿ª¹ÜÀíºóÌ¨...
+echo   µØÖ·: http://localhost:8080/admin/index.html
+echo   ÕËºÅ: admin / admin123
 echo.
 
 start http://localhost:8080/admin/index.html
 
-echo   å·²æ‰“å¼€æµè§ˆå™¨ã€‚
-echo   è‹¥é¡µé¢æ‰“ä¸å¼€ï¼Œè¯·å…ˆè¿è¡Œã€Œä¸€é”®å¯åŠ¨.batã€ã€‚
+echo   ÒÑ´ò¿ªä¯ÀÀÆ÷¡£
+echo   ÈôÒ³Ãæ´ò²»¿ª£¬ÇëÏÈÔËĞĞ¡¸Ò»¼üÆô¶¯.bat¡¹¡£
 echo.
 pause
