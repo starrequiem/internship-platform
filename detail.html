@@ -98,9 +98,19 @@
         <button class="btn-save" id="btnReport" onclick="showReportModal(${item.id})" style="display:inline-flex;align-items:center;justify-content:center;background:#fef2f2;border-color:#ef4444;color:#dc2626;margin-left:auto">🚩 反馈/举报</button>
       </div>`;
 
+    // 按标题定位 section（header 里的「联系信息」也用了 .detail-section，不能用索引）
+    function findSection(text) {
+      var secs = document.querySelectorAll('.detail-section');
+      for (var i = 0; i < secs.length; i++) {
+        var h2 = secs[i].querySelector('h2');
+        if (h2 && h2.textContent.indexOf(text) >= 0) return secs[i];
+      }
+      return null;
+    }
+
     // 职位描述 — 完整展示（保留换行，避免丢行）
-    const sections = document.querySelectorAll('.detail-section');
-    if (sections[0] && item.description) {
+    var descSec = findSection('职位描述');
+    if (descSec && item.description) {
       var lines = item.description.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
       var bullets = [], paras = [];
       for (var di = 0; di < lines.length; di++) {
@@ -109,11 +119,11 @@
         else paras.push(dl);
       }
       if (bullets.length) {
-        sections[0].querySelector('ul').innerHTML = bullets.map(function(b){ return '<li>'+escHtml(b)+'</li>'; }).join('');
+        descSec.querySelector('ul').innerHTML = bullets.map(function(b){ return '<li>'+escHtml(b)+'</li>'; }).join('');
       } else {
-        sections[0].querySelector('ul').innerHTML = '';
+        descSec.querySelector('ul').innerHTML = '';
       }
-      var p = sections[0].querySelector('p');
+      var p = descSec.querySelector('p');
       if (paras.length) {
         p.style.whiteSpace = 'pre-wrap';
         p.textContent = paras.join('\n');
@@ -122,20 +132,21 @@
       }
     }
     // 任职要求 — 有数据才显示
-    if (sections[1]) {
+    var reqSec = findSection('任职要求');
+    if (reqSec) {
       if (item.requirements && item.requirements.trim()) {
         var reqLines = item.requirements.split('\n').filter(function(l){ return l.trim(); });
-        sections[1].querySelector('ul').innerHTML = reqLines.map(function(l){ return '<li>'+escHtml(l.trim())+'</li>'; }).join('');
+        reqSec.querySelector('ul').innerHTML = reqLines.map(function(l){ return '<li>'+escHtml(l.trim())+'</li>'; }).join('');
       } else {
-        sections[1].style.display = 'none';
+        reqSec.style.display = 'none';
       }
     }
     // 标签 — 有数据才显示
     if (item.tags && item.tags.length) {
       document.querySelector('.detail-tags').innerHTML = item.tags.map(function(t){ return '<span class=\"card-tag\">'+escHtml(t)+'</span>'; }).join('');
     } else {
-      var ts = document.querySelectorAll('.detail-section')[2];
-      if (ts && ts.querySelector('h2').textContent.indexOf('标签') >= 0) ts.style.display = 'none';
+      var tagSec = findSection('标签');
+      if (tagSec) tagSec.style.display = 'none';
     }
     // 相关推荐-加载更多同类
     try {
