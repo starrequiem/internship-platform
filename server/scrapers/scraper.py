@@ -68,9 +68,9 @@ def _collect_one_list(page, url, site):
     jobs = []
     try:
         page.goto(url, wait_until='networkidle', timeout=60000)
-        for _ in range(6):
+        for _ in range(15):
             page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
-            page.wait_for_timeout(1200)
+            page.wait_for_timeout(1000)
         pat = site.get('link_pattern') or ''
         jobs = page.evaluate('''(pat) => {
             const out = [], seen = new Set();
