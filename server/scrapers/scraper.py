@@ -221,6 +221,36 @@ def clear_internships(conn):
     print('✅ 已清空旧实习数据（internships / internship_tags）')
 
 
+def run_ai_mode(site):
+    """大厂整页抓取：爬整页正文，保存到 raw_pages 供 AI 分割（不收集链接、不抓详情）"""
+    raw_dir = os.path.join(DATA_DIR, 'raw_pages')
+    os.makedirs(raw_dir, exist_ok=True)
+    urls = site.get('list_urls', [])
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page(viewport={'width': 1366, 'height': 900})
+        for i, url in enumerate(urls):
+            print(f'[{i+1}/{len(urls)}] {url}')
+            try:
+                page.goto(url, wait_until='networkidle', timeout=40000)
+                page.wait_for_timeout(3000)
+                for _ in range(5):
+                    page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+                    page.wait_for_timeout(1200)
+                text = page.evaluate('() => document.body ? document.body.innerText : ""') or ''
+                data = {'name': f'{site["key"]}_{i}', 'url': url, 'text': text, 'html_snippet': ''}
+                fname = os.path.join(raw_dir, f'{site["key"]}_{i}_{int(time.time())}.json')
+                with open(fname, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                print(f'    整页 {len(text)} 字 -> {os.path.basename(fname)}')
+            except Exception as e:
+                print(f'    失败: {str(e)[:80]}')
+            time.sleep(2)
+        browser.close()
+    print('\n✅ 整页已保存到 raw_pages/')
+    print('下一步: python ai_parse.py prepare 生成 AI prompt → AI 分割 → python ai_parse.py insert 入库')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--site', default='nowcoder', help='站点 key：nowcoder / default')
@@ -231,6 +261,10 @@ def main():
 
     site = get_site(args.site)
     print(f'═══ 站点: {site["name"]} ({site["type"]}) 模式: {site["extract"]} ═══')
+
+    if site.get('extract') == 'ai':
+        run_ai_mode(site)
+        return
 
     results = []
     with sync_playwright() as p:
