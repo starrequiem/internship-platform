@@ -6,4 +6,4 @@ uploads/
 nul
 __pycache__/
 *.pyc
-server/scraped_data/export/
+server/scraped_data/
