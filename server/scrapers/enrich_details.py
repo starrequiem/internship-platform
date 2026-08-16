@@ -8,53 +8,36 @@ sys.path.insert(0, os.path.dirname(__file__))
 from playwright.sync_api import sync_playwright
 from inserter import get_conn
 from config import extract_company_fallback
+from extract import split_detail
 
 def scrape_one(page, url):
-    """抓取单个详情页，返回 {description, requirements, company, tags}"""
+    """抓取单个详情页，返回 {desc, req, company, tags}（按标题边界稳健分割）"""
     result = {'desc': '', 'req': '', 'company': '', 'tags': []}
     try:
-        page.goto(url, wait_until='domcontentloaded', timeout=20000)
-        page.wait_for_timeout(2000)
+        page.goto(url, wait_until='domcontentloaded', timeout=25000)
+        page.wait_for_timeout(2500)
+        page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+        page.wait_for_timeout(800)
 
-        data = page.evaluate('''() => {
-            const body = document.body ? document.body.innerText : '';
-            let desc = body;
-            let req = '';
+        body = page.evaluate('() => document.body ? document.body.innerText : ""') or ''
+        desc, req = split_detail(body)
+        result['desc'] = desc[:5000]
+        result['req'] = req[:3000]
 
-            // 找所有可见文本中的描述和要求
-            const sections = document.querySelectorAll('div, section, article');
-            sections.forEach(el => {
-                const prev = el.previousElementSibling;
-                if (prev) {
-                    const label = prev.innerText.trim();
-                    if (label.includes('职位描述') || label.includes('岗位职责') || label.includes('工作内容'))
-                        desc = el.innerText || desc;
-                    if (label.includes('任职要求') || label.includes('岗位要求') || label.includes('职位要求'))
-                        req = el.innerText || req;
-                }
-            });
-
-            // 公司名
-            let company = '';
-            const cEl = document.querySelector('.company-name, .corp-name, [class*="company-name"]');
-            if (cEl) company = cEl.innerText.trim();
-
-            // 标签
-            let tags = [];
-            document.querySelectorAll('.tag-item, .skill-tag, [class*="tag"] span, .label-item').forEach(t => {
-                const txt = t.innerText.trim();
-                if (txt && txt.length < 20 && !tags.includes(txt)) tags.push(txt);
-            });
-
-            return {body, desc: desc || body, req, company, tags};
+        company = page.evaluate('''() => {
+            const el = document.querySelector('.company-name, .corp-name, [class*="company-name"]');
+            return el ? el.innerText.trim().split('\\n')[0] : '';
         }''')
+        result['company'] = company or extract_company_fallback(body)
 
-        result['desc'] = (data.get('desc') or data.get('body') or '')[:5000]
-        result['req'] = (data.get('req') or '')[:3000]
-        result['company'] = data.get('company', '')[:100]
-        if not result['company']:
-            result['company'] = extract_company_fallback(result['desc'])
-        result['tags'] = data.get('tags', [])[:10]
+        result['tags'] = page.evaluate('''() => {
+            const t = [];
+            document.querySelectorAll('.tag-item, .skill-tag, [class*="tag"] span, .label-item, .tech-tag').forEach(el => {
+                const txt = el.innerText.trim();
+                if (txt && txt.length < 20 && t.indexOf(txt) < 0) t.push(txt);
+            });
+            return t.slice(0, 10);
+        }''')
 
     except Exception as e:
         print(f'  Error: {e}')
