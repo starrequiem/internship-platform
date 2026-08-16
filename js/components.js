@@ -69,7 +69,6 @@ function getFallbackHTML(name) {
       <div class="header-inner">
         <a href="index.html" class="logo">实习<span>通</span></a>
         <div class="search-box"><input type="search" placeholder="搜索..."></div>
-        <a href="publish.html" class="btn-post">📤 发布</a>
         <a href="login.html" class="btn-login">登录</a>
       </div>
     </header>`;

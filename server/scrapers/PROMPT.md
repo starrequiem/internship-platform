@@ -28,6 +28,16 @@ python inserter.py
 python enrich_details.py
 ```
 
+## 数据推送后台（联动）
+
+```
+# 把 parsed JSON 导出为标准 CSV
+python export_and_push.py
+
+# 导出并直接推送到后台导入接口（需后端已启动）
+python export_and_push.py --push
+```
+
 ## 数据库连接
 
 ```

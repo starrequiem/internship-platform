@@ -1,6 +1,7 @@
 """
 Target site configs + classification rules
 """
+import re
 
 SITES = [
     {
@@ -157,3 +158,37 @@ COMPANIES = [
     'OPPO','vivo','荣耀','海康威视','大华','新浪','搜狐',
     '360','知乎','唯品会','得物','米哈游','莉莉丝','叠纸',
 ]
+
+# 公司名误匹配黑名单（含「技术/科技」等后缀但不是公司名的词）
+_COMPANY_FALSE = {'高新技术', '人工智能', '企业服务', '互联网', '大数据', '信息技术', '通信电子'}
+
+
+def clean_company(name):
+    """去掉公司名开头的城市前缀"""
+    name = name.strip()
+    for city in CITIES + ['远程']:
+        if name.startswith(city):
+            name = name[len(city):]
+            if name.startswith('市'):
+                name = name[1:]
+            break
+    return name.strip()
+
+
+def extract_company_fallback(text):
+    """COMPANIES 列表未命中时，从文本兜底提取公司名（按后缀规则）"""
+    if not text:
+        return ''
+    # 1. 完整法律名称（最强信号，优先）
+    m = re.search(r'([一-龥]{2,20}(?:股份有限公司|有限责任公司|有限公司))', text)
+    if m:
+        return clean_company(m.group(1))
+    # 2. 常见公司后缀短语
+    m = re.search(
+        r'([一-龥A-Za-z·]{2,15}(?:科技|网络|信息|软件|传媒|文化|教育|医疗|投资|银行|证券|保险|集团|研究院|实验室|制药|汽车|电子|通信))',
+        text)
+    if m:
+        name = clean_company(m.group(1))
+        if name and name not in _COMPANY_FALSE:
+            return name
+    return ''

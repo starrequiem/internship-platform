@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from playwright.sync_api import sync_playwright
 from inserter import get_conn
+from config import extract_company_fallback
 
 def scrape_one(page, url):
     """抓取单个详情页，返回 {description, requirements, company, tags}"""
@@ -51,6 +52,8 @@ def scrape_one(page, url):
         result['desc'] = (data.get('desc') or data.get('body') or '')[:5000]
         result['req'] = (data.get('req') or '')[:3000]
         result['company'] = data.get('company', '')[:100]
+        if not result['company']:
+            result['company'] = extract_company_fallback(result['desc'])
         result['tags'] = data.get('tags', [])[:10]
 
     except Exception as e:
@@ -61,11 +64,11 @@ def main():
     conn = get_conn()
     cur = conn.cursor()
 
-    # 获取所有有URL但描述少于100字的实习
+    # 获取所有有牛客详情URL、但任职要求为空或描述过短的实习
     cur.execute("""
         SELECT id, contact_info FROM internships
-        WHERE contact_info LIKE '%http%'
-        AND (LENGTH(description) < 100 OR description IS NULL)
+        WHERE contact_info LIKE '%nowcoder.com/jobs/detail/%'
+        AND (requirements IS NULL OR requirements = '' OR LENGTH(description) < 100)
         ORDER BY id
     """)
     rows = cur.fetchall()
@@ -89,8 +92,8 @@ def main():
         page = browser.new_page(viewport={'width': 1366, 'height': 900})
 
         updated = 0
-        for i, (tid, url) in enumerate(urls[:50]):  # 每次最多50条
-            print(f'[{i+1}/{min(50,len(urls))}] #{tid} {url[:70]}')
+        for i, (tid, url) in enumerate(urls):
+            print(f'[{i+1}/{len(urls)}] #{tid} {url[:70]}')
             data = scrape_one(page, url)
 
             # 更新数据库

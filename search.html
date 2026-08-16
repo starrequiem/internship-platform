@@ -154,13 +154,6 @@
 
   <!-- 侧边栏 -->
   <aside class="sidebar">
-    <div class="widget publish-widget">
-      <div class="icon">🔍</div>
-      <div class="title">没找到合适的？</div>
-      <div class="subtitle">试试订阅关键词，新岗位发布时通知你</div>
-      <a href="index.html" class="btn-publish" style="display:block;text-decoration:none">📬 去首页订阅</a>
-    </div>
-
     <div class="widget">
       <h3>🔗 相关搜索</h3>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
@@ -289,7 +282,7 @@ function showEmpty(keyword) {
   const container = document.querySelector('.content');
   container.querySelectorAll('.card,.pagination').forEach(c => c.remove());
   container.insertAdjacentHTML('beforeend',
-    '<div class="empty-state"><div class="icon">🔍</div><p>没有找到与 "<b>'+escHtml(keyword)+'</b>" 相关的实习信息</p><p style="font-size:13px;color:#9ca3af;margin-top:8px">试试换个关键词，或者发布你知道的实习信息</p></div>');
+    '<div class="empty-state"><div class="icon">🔍</div><p>没有找到与 "<b>'+escHtml(keyword)+'</b>" 相关的实习信息</p><p style="font-size:13px;color:#9ca3af;margin-top:8px">试试换个关键词再搜索</p></div>');
 }
 
 function renderPagination(container, total, page, limit) {

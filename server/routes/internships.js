@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const pool = require('../db');
-const { requireAuth, optionalAuth } = require('../middleware/auth');
+const { optionalAuth, requireAdmin } = require('../middleware/auth');
 
 // GET /api/internships — 列表（公开）
 router.get('/', async (req, res) => {
@@ -129,8 +129,8 @@ router.get('/:id', optionalAuth, async (req, res) => {
   }
 });
 
-// POST /api/internships — 发布（需登录）
-router.post('/', requireAuth, async (req, res) => {
+// POST /api/internships — 发布（仅管理员）
+router.post('/', requireAdmin, async (req, res) => {
   try {
     const { title, company, city, district, job_type, salary_min, salary_max,
             education, days_per_week, duration_months, target_grade, target_major,
@@ -174,12 +174,11 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-// PUT /api/internships/:id — 编辑实习（仅发布者本人）
-router.put('/:id', requireAuth, async (req, res) => {
+// PUT /api/internships/:id — 编辑实习（仅管理员）
+router.put('/:id', requireAdmin, async (req, res) => {
   try {
-    const [[intern]] = await pool.query('SELECT poster_id, status FROM internships WHERE id = ?', [req.params.id]);
+    const [[intern]] = await pool.query('SELECT id FROM internships WHERE id = ?', [req.params.id]);
     if (!intern) return res.status(404).json({ error: '岗位不存在' });
-    if (intern.poster_id !== req.user.id) return res.status(403).json({ error: '只能编辑自己发布的实习' });
 
     const { title, company, city, district, job_type, salary_min, salary_max,
             education, days_per_week, duration_months, target_grade, target_major,
@@ -231,12 +230,11 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// PUT /api/internships/:id/close — 关闭实习（仅发布者本人）
-router.put('/:id/close', requireAuth, async (req, res) => {
+// PUT /api/internships/:id/close — 关闭实习（仅管理员）
+router.put('/:id/close', requireAdmin, async (req, res) => {
   try {
-    const [[intern]] = await pool.query('SELECT poster_id, status FROM internships WHERE id = ?', [req.params.id]);
+    const [[intern]] = await pool.query('SELECT id FROM internships WHERE id = ?', [req.params.id]);
     if (!intern) return res.status(404).json({ error: '岗位不存在' });
-    if (intern.poster_id !== req.user.id) return res.status(403).json({ error: '只能关闭自己发布的实习' });
 
     await pool.query("UPDATE internships SET status = 'closed' WHERE id = ?", [req.params.id]);
     res.json({ message: '实习已关闭' });

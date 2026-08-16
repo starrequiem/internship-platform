@@ -26,6 +26,8 @@ tr:hover td{background:rgba(99,102,241,.05)}
 .btn-danger:hover{background:#b91c1c}
 .btn-primary{background:#4f46e5;color:#fff;margin-right:8px}
 .btn-primary:hover{background:#4338ca}
+.btn-ghost{background:#334155;color:#e2e8f0;margin-right:8px}
+.btn-ghost:hover{background:#475569}
 .expired td{background:rgba(239,68,68,.05)}
 .login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a}
 .login-box{background:#1e293b;border-radius:16px;padding:40px;width:360px;text-align:center}
@@ -38,6 +40,18 @@ tr:hover td{background:rgba(99,102,241,.05)}
 .error{color:#f87171;font-size:13px;margin-bottom:12px;display:none}
 .hidden{display:none}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;font-size:14px;z-index:999;background:#065f46;color:#fff}
+.pform{max-width:760px;background:#1e293b;border-radius:12px;padding:24px}
+.pform h2{font-size:18px;margin-bottom:4px;color:#f1f5f9}
+.pform .sub{font-size:12px;color:#64748b;margin-bottom:20px}
+.pform label{display:block;font-size:12px;color:#94a3b8;margin-bottom:6px}
+.pform label .req{color:#f87171}
+.pform input,.pform select,.pform textarea{width:100%;padding:10px 14px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px;margin-bottom:14px;outline:none;font-family:inherit;box-sizing:border-box}
+.pform input:focus,.pform select:focus,.pform textarea:focus{border-color:#818cf8}
+.pform textarea{resize:vertical;min-height:80px}
+.pform .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pform .row.single{grid-template-columns:1fr}
+.pform .btn-save{width:100%;padding:12px;background:#4f46e5;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.pform .btn-save:hover{background:#4338ca}
 </style>
 </head>
 <body>
@@ -60,7 +74,9 @@ tr:hover td{background:rgba(99,102,241,.05)}
     <h2>实习<span style="color:#818cf8">通</span></h2>
     <a class="active" onclick="showTab('dashboard',this)">📊 仪表盘</a>
     <a onclick="showTab('internships',this)">📋 实习管理</a>
+    <a onclick="showTab('publish',this)">📤 发布实习</a>
     <a onclick="showTab('users',this)">👥 用户管理</a>
+    <a onclick="showTab('reports',this)">📮 反馈管理</a>
     <a onclick="doAdminLogout()" style="color:#f87171;margin-top:auto">🚪 退出</a>
   </div>
   <div class="main" id="mainContent"></div>
@@ -117,7 +133,9 @@ function showTab(tab, el) {
   if (el) el.classList.add('active');
   if (tab === 'dashboard') loadDashboard();
   else if (tab === 'internships') loadInternships();
+  else if (tab === 'publish') loadPublish();
   else if (tab === 'users') loadUsers();
+  else if (tab === 'reports') loadReports();
 }
 
 async function api(path, method, body) {
@@ -180,6 +198,132 @@ async function deleteIntern(id) {
   loadInternships();
 }
 
+function loadPublish() {
+  document.getElementById('mainContent').innerHTML =
+    '<h2 style="margin-bottom:16px">📤 发布实习</h2>' +
+    '<div class="pform">' +
+      '<p class="sub">管理员发布岗位，前台用户仅可浏览与收藏</p>' +
+      '<div class="row">' +
+        '<div><label><span class="req">*</span> 岗位名称</label><input id="pfTitle" placeholder="例如：前端开发实习生"></div>' +
+        '<div><label><span class="req">*</span> 公司名称</label><input id="pfCompany" placeholder="公司名称"></div>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div><label><span class="req">*</span> 工作城市</label><select id="pfCity">' +
+          '<option value="">请选择</option><option>北京</option><option>上海</option><option>广州</option><option>深圳</option><option>杭州</option><option>成都</option><option>南京</option><option>武汉</option><option>西安</option><option>苏州</option><option>远程办公</option>' +
+        '</select></div>' +
+        '<div><label><span class="req">*</span> 岗位类型</label><select id="pfJobType">' +
+          '<option value="">请选择</option><option>技术开发</option><option>产品经理</option><option>UI/UX 设计</option><option>数据分析</option><option>运营</option><option>市场商务</option><option>金融投资</option><option>人力资源</option><option>财务会计</option><option>法务合规</option>' +
+        '</select></div>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div><label>详细地址</label><input id="pfDistrict" placeholder="例如：海淀区中关村（选填）"></div>' +
+        '<div><label>薪资范围（元/天）</label><div class="row" style="gap:8px">' +
+          '<input id="pfSalaryMin" type="number" min="0" placeholder="最低" style="margin-bottom:0">' +
+          '<input id="pfSalaryMax" type="number" min="0" placeholder="最高" style="margin-bottom:0">' +
+        '</div></div>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div><label>学历要求</label><select id="pfEducation">' +
+          '<option value="">请选择</option><option>不限</option><option>大专及以上</option><option>本科及以上</option><option>硕士及以上</option><option>博士</option>' +
+        '</select></div>' +
+        '<div><label>每周出勤（天）</label><input id="pfDays" type="number" min="1" max="7" value="4"></div>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div><label>实习时长（月）</label><input id="pfDuration" type="number" min="1" value="3"></div>' +
+        '<div><label>投递截止日期</label><input id="pfDeadline" type="date"></div>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div><label>招聘人数</label><input id="pfHeadcount" type="number" min="1" value="1"></div>' +
+        '<div><label>面向专业</label><select id="pfMajor">' +
+          '<option value="">不限专业</option><option>计算机/软件</option><option>电子信息/通信</option><option>人工智能/大数据</option><option>数学/统计</option><option>经管/金融</option><option>市场营销/广告</option><option>设计/传媒</option><option>机械/自动化</option><option>外语/国际贸易</option><option>法学</option>' +
+        '</select></div>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div><label>面向年级</label><select id="pfGrade">' +
+          '<option value="">不限</option><option>2026届</option><option>2027届</option><option>2028届</option><option>2029届</option>' +
+        '</select></div>' +
+        '<div><label>技术标签（逗号分隔）</label><input id="pfTags" placeholder="例如：React, TypeScript, 有转正机会"></div>' +
+      '</div>' +
+      '<div class="row single"><div><label>职位描述</label><textarea id="pfDesc" placeholder="描述工作内容、参与的项目等"></textarea></div></div>' +
+      '<div class="row single"><div><label>任职要求</label><textarea id="pfReq" placeholder="描述候选人需要具备的技能和能力"></textarea></div></div>' +
+      '<div class="row single"><div><label>联系信息</label><textarea id="pfContact" placeholder="招聘链接、HR邮箱、电话等投递方式"></textarea></div></div>' +
+      '<button class="btn-save" onclick="submitPublish()">📤 发布实习信息</button>' +
+    '</div>' +
+    '<div class="pform" style="margin-top:16px">' +
+      '<h2>📥 批量导入 CSV / Excel</h2>' +
+      '<p class="sub">上传格式正确的 csv / xlsx 文件，自动读取并批量入库。表头需包含：岗位名称、公司名称、工作城市、岗位类型（必填）；其余列（详细地址、最低薪资、最高薪资、学历要求、每周出勤、实习时长、面向年级、面向专业、招聘人数、截止日期、职位描述、任职要求、联系信息、标签）选填。</p>' +
+      '<div class="row"><div><label>选择文件</label><input type="file" id="pfImportFile" accept=".csv,.xlsx,.xls" style="padding:8px"></div></div>' +
+      '<button class="btn-save" onclick="importInterns()" style="margin-top:4px">📥 上传并导入</button>' +
+      '<div id="pfImportResult" style="margin-top:12px;font-size:13px;color:#94a3b8;white-space:pre-wrap"></div>' +
+    '</div>';
+}
+
+async function submitPublish() {
+  var title = document.getElementById('pfTitle').value.trim();
+  var company = document.getElementById('pfCompany').value.trim();
+  var city = document.getElementById('pfCity').value;
+  var job_type = document.getElementById('pfJobType').value;
+  if (!title || !company || !city || !job_type) {
+    alert('请填写必填字段（岗位名称/公司名称/工作城市/岗位类型）');
+    return;
+  }
+  var tags = document.getElementById('pfTags').value.split(/[,，]/).map(function(t){ return t.trim(); }).filter(Boolean);
+  var body = {
+    title: title,
+    company: company,
+    city: city,
+    district: document.getElementById('pfDistrict').value.trim(),
+    job_type: job_type,
+    salary_min: document.getElementById('pfSalaryMin').value || null,
+    salary_max: document.getElementById('pfSalaryMax').value || null,
+    education: document.getElementById('pfEducation').value,
+    days_per_week: parseInt(document.getElementById('pfDays').value) || 4,
+    duration_months: parseInt(document.getElementById('pfDuration').value) || 3,
+    deadline: document.getElementById('pfDeadline').value || null,
+    headcount: parseInt(document.getElementById('pfHeadcount').value) || 1,
+    target_major: document.getElementById('pfMajor').value,
+    target_grade: document.getElementById('pfGrade').value,
+    description: document.getElementById('pfDesc').value.trim(),
+    requirements: document.getElementById('pfReq').value.trim(),
+    contact_info: document.getElementById('pfContact').value.trim(),
+    tags: tags
+  };
+  try {
+    var r = await api('/internships', 'POST', body);
+    alert('✅ 发布成功（ID: ' + r.id + '）');
+    showTab('internships');
+  } catch(e) {
+    alert('发布失败：' + e.message);
+  }
+}
+
+async function importInterns() {
+  var input = document.getElementById('pfImportFile');
+  if (!input || !input.files.length) { alert('请先选择 csv 或 excel 文件'); return; }
+  var resultEl = document.getElementById('pfImportResult');
+  resultEl.textContent = '导入中...';
+  resultEl.style.color = '#94a3b8';
+  var fd = new FormData();
+  fd.append('file', input.files[0]);
+  try {
+    var resp = await fetch(API + '/internships/import', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    });
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    var msg = '✅ 导入完成：成功 ' + data.inserted + ' 条，跳过 ' + data.skipped + ' 条';
+    if (data.errors && data.errors.length) msg += '\n' + data.errors.join('\n');
+    resultEl.textContent = msg;
+    resultEl.style.color = data.inserted > 0 ? '#4ade80' : '#fbbf24';
+    input.value = '';
+  } catch(e) {
+    resultEl.textContent = '导入失败：' + e.message;
+    resultEl.style.color = '#f87171';
+  }
+}
+
 async function loadUsers() {
   var rows = await api('/users');
   var html = '<h2 style="margin-bottom:16px">👥 用户管理 ('+rows.length+'人)</h2>' +
@@ -189,6 +333,75 @@ async function loadUsers() {
   });
   html += '</table>';
   document.getElementById('mainContent').innerHTML = html;
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+var _reportFull = {};
+
+async function loadReports() {
+  var rows = await api('/reports');
+  _reportFull = {};
+  rows.forEach(function(r){ _reportFull[r.id] = r.message || ''; });
+  var html = '<h2 style="margin-bottom:16px">📮 反馈管理 ('+rows.length+'条)</h2>';
+  if (!rows.length) {
+    html += '<div style="padding:60px;text-align:center;color:#64748b">暂无反馈</div>';
+  } else {
+    html += '<table><tr><th>ID</th><th>状态</th><th>类型</th><th>反馈内容</th><th>相关岗位</th><th>反馈人</th><th>时间</th><th>操作</th></tr>';
+    rows.forEach(function(r){
+      var statusMap = { pending: '<span style="color:#fbbf24">待处理</span>', reviewed: '<span style="color:#60a5fa">已查看</span>', resolved: '<span style="color:#4ade80">已解决</span>' };
+      var statusHtml = statusMap[r.status] || '<span>'+esc(r.status||'')+'</span>';
+      var jobHtml = r.title ? esc(r.title.slice(0,15))+' @ '+esc((r.company||'').slice(0,10)) : (r.internship_id ? '#'+r.internship_id : '-');
+      html += '<tr>' +
+        '<td>'+r.id+'</td>' +
+        '<td>'+statusHtml+'</td>' +
+        '<td>'+(r.type||'other')+'</td>' +
+        '<td>'+esc((r.message||'').slice(0,40))+'</td>' +
+        '<td>'+jobHtml+'</td>' +
+        '<td>'+(r.reporter||('用户#'+r.user_id))+'</td>' +
+        '<td>'+new Date(r.created_at).toLocaleString()+'</td>' +
+        '<td style="white-space:nowrap">' +
+          '<button class="btn btn-ghost" onclick="toggleReportFull('+r.id+', this)">查看全文</button>' +
+          (r.status !== 'resolved' ? '<button class="btn btn-primary" onclick="handleReport('+r.id+')">标记已处理</button>' : '') +
+          '<button class="btn btn-danger" onclick="deleteReport('+r.id+')">删除</button>' +
+        '</td>' +
+      '</tr>';
+    });
+    html += '</table>';
+  }
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function toggleReportFull(id, btn) {
+  var tr = btn.closest('tr');
+  var next = tr.nextElementSibling;
+  if (next && next.className === 'report-detail') {
+    next.remove();
+    btn.textContent = '查看全文';
+    return;
+  }
+  var detail = document.createElement('tr');
+  detail.className = 'report-detail';
+  detail.innerHTML = '<td colspan="8" style="white-space:normal;max-width:none;padding:16px;color:#e2e8f0;background:#0f172a">' +
+    '<div style="white-space:pre-wrap;word-break:break-all;font-size:13px;line-height:1.7">' + esc(_reportFull[id]) + '</div></td>';
+  tr.after(detail);
+  btn.textContent = '收起';
+}
+
+async function handleReport(id) {
+  await api('/reports/'+id, 'PUT');
+  loadReports();
+}
+
+async function deleteReport(id) {
+  if (!confirm('确定删除该反馈？')) return;
+  await api('/reports/'+id, 'DELETE');
+  loadReports();
 }
 </script>
 </body>

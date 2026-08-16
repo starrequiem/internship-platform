@@ -35,14 +35,6 @@
   <div class="detail-section"><h2>职位描述</h2><p></p><ul></ul></div>
   <div class="detail-section"><h2>任职要求</h2><ul></ul></div>
   <div class="detail-section"><h2>技术栈 &amp; 标签</h2><div class="detail-tags"></div></div>
-  <div class="detail-section">
-    <h2>信息分享者</h2>
-    <div class="detail-poster">
-      <div class="avatar">?</div>
-      <div><div class="name"></div><div class="meta"></div></div>
-      <a href="#" style="margin-left:auto;color:#4f46e5;font-size:13px;font-weight:600;text-decoration:none">查看TA的主页 →</a>
-    </div>
-  </div>
 
   <div class="section-header" style="margin-top:28px">
     <h2>📋 相关推荐</h2>
@@ -106,24 +98,27 @@
         <button class="btn-save" id="btnReport" onclick="showReportModal(${item.id})" style="display:inline-flex;align-items:center;justify-content:center;background:#fef2f2;border-color:#ef4444;color:#dc2626;margin-left:auto">🚩 反馈/举报</button>
       </div>`;
 
-    // 职位描述 — 始终显示（用原始文本分行展示）
+    // 职位描述 — 完整展示（保留换行，避免丢行）
     const sections = document.querySelectorAll('.detail-section');
     if (sections[0] && item.description) {
-      var descLines = item.description.split('\n').filter(function(l){ return l.trim(); });
-      var descHtml = '';
-      for (var di = 0; di < descLines.length; di++) {
-        var dl = descLines[di].trim();
-        if (dl.startsWith('•') || dl.startsWith('-') || dl.startsWith('·')) {
-          descHtml += '<li>'+escHtml(dl.replace(/^[•\-·]\s*/, ''))+'</li>';
-        } else if (di === 0) {
-          descHtml += '<p>'+escHtml(dl)+'</p>';
-        }
+      var lines = item.description.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+      var bullets = [], paras = [];
+      for (var di = 0; di < lines.length; di++) {
+        var dl = lines[di];
+        if (/^[•\-·]/.test(dl)) bullets.push(dl.replace(/^[•\-·]\s*/, ''));
+        else paras.push(dl);
       }
-      if (descHtml.indexOf('<li>') >= 0) {
-        sections[0].querySelector('ul').innerHTML = descHtml.match(/<li>.*?<\/li>/g) ? descHtml.match(/<li>.*?<\/li>/g).join('') : '';
+      if (bullets.length) {
+        sections[0].querySelector('ul').innerHTML = bullets.map(function(b){ return '<li>'+escHtml(b)+'</li>'; }).join('');
+      } else {
+        sections[0].querySelector('ul').innerHTML = '';
       }
-      if (descHtml.indexOf('<p>') >= 0) {
-        sections[0].querySelector('p').textContent = descLines[0];
+      var p = sections[0].querySelector('p');
+      if (paras.length) {
+        p.style.whiteSpace = 'pre-wrap';
+        p.textContent = paras.join('\n');
+      } else {
+        p.textContent = '';
       }
     }
     // 任职要求 — 有数据才显示
@@ -141,16 +136,6 @@
     } else {
       var ts = document.querySelectorAll('.detail-section')[2];
       if (ts && ts.querySelector('h2').textContent.indexOf('标签') >= 0) ts.style.display = 'none';
-    }
-    // 分享者
-    const posterSection = document.querySelector('.detail-poster');
-    if (posterSection && item.username) {
-      posterSection.querySelector('.avatar').textContent = item.username.charAt(0);
-      posterSection.querySelector('.name').innerHTML = escHtml(item.username) +
-        (item.school ? '（'+escHtml(item.school)+' · '+escHtml(item.major||'')+'）' : '');
-      posterSection.querySelector('.meta').textContent = '已分享多条实习信息 · 发布于 ' + new Date(item.created_at).toLocaleDateString('zh-CN');
-      const link = posterSection.querySelector('a');
-      if (link) link.href = 'profile.html?id=' + item.poster_id;
     }
     // 相关推荐-加载更多同类
     try {

@@ -34,4 +34,12 @@ function optionalAuth(req, res, next) {
   next();
 }
 
-module.exports = { requireAuth, optionalAuth };
+/** 强制管理员：仅管理员 token（role=admin）可通过 */
+function requireAdmin(req, res, next) {
+  requireAuth(req, res, () => {
+    if (req.user && req.user.role === 'admin') return next();
+    return res.status(403).json({ error: '需要管理员权限' });
+  });
+}
+
+module.exports = { requireAuth, optionalAuth, requireAdmin };

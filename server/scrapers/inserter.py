@@ -68,25 +68,15 @@ def insert_item(item, default_poster_id=1):
 
     # 去重: title + company + city 三字段联合唯一
     cur.execute(
-        'SELECT id, description, requirements, deadline, salary_min, salary_max, review_status FROM internships WHERE title = %s AND company = %s AND city = %s LIMIT 1',
+        'SELECT id, description, requirements, deadline, salary_min, salary_max FROM internships WHERE title = %s AND company = %s AND city = %s LIMIT 1',
         [title, company, city]
     )
     existing = cur.fetchone()
 
     if existing:
-        eid, old_desc, old_reqs, old_deadline, old_min, old_max, old_review = existing
+        eid, old_desc, old_reqs, old_deadline, old_min, old_max = existing
         old_desc = old_desc or ''
         old_reqs = old_reqs or ''
-
-        # 管理员已拒绝的 → 不覆盖（管理员人工判断优先）
-        if old_review == 'rejected':
-            print(f'   [SKIP] #{eid} {company} - {title} (admin rejected, respecting manual decision)')
-            return eid
-
-        # 如果审核状态不是 approved（pending），爬虫不覆盖（等管理员先审核）
-        if old_review == 'pending':
-            print(f'   [SKIP] #{eid} {company} - {title} (pending review, waiting for admin)')
-            return eid
 
         # 二次校验: 如果新旧描述差异很大(>50%不同), 视为不同岗位
         if desc and old_desc:
@@ -127,13 +117,13 @@ def insert_item(item, default_poster_id=1):
             '''INSERT INTO internships
                (poster_id, title, company, city, job_type, salary_min, salary_max,
                 education, days_per_week, duration_months, headcount, deadline,
-                description, requirements, contact_info, status, review_status)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+                description, requirements, contact_info, status)
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
             [default_poster_id, title, company, city, job_type,
              salary_min, salary_max, education,
              4, 3, headcount, deadline,
              desc[:5000], reqs[:3000],
-             contact_info[:2000], 'active', 'pending']
+             contact_info[:2000], 'active']
         )
         new_id = cur.lastrowid
 
@@ -207,8 +197,8 @@ def insert_from_file(filepath):
     return inserted, skipped
 
 
-if __name__ == '__main__':
-    # 读取所有 parsed 目录的 JSON
+def run_insert():
+    """入库所有 parsed 目录的 JSON，返回 (新增, 跳过)。供 main.py insert 与命令行调用。"""
     parsed_dir = os.path.join(os.path.dirname(__file__), '..', 'scraped_data', 'parsed')
     total_in, total_skip = 0, 0
     if os.path.isdir(parsed_dir):
@@ -218,3 +208,8 @@ if __name__ == '__main__':
                 a, b = insert_from_file(os.path.join(parsed_dir, fname))
                 total_in += a; total_skip += b
     print(f'\n 入库:  {total_in} 新增 |  {total_skip} 跳过')
+    return total_in, total_skip
+
+
+if __name__ == '__main__':
+    run_insert()

@@ -3,7 +3,7 @@
 """
 import re, json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
-from config import COMPANIES, CITIES, CLASSIFY_RULES
+from config import COMPANIES, CITIES, CLASSIFY_RULES, extract_company_fallback
 
 def parse_nowcoder_text(text):
     """从牛客网文本提取结构化数据"""
@@ -100,6 +100,8 @@ def parse_from_links(job_links, source_url=''):
             if comp in all_text:
                 company = comp
                 break
+        if not company:
+            company = extract_company_fallback(title_text)  # 兜底按后缀提取
 
         # 提取每周天数
         days = 4
@@ -113,7 +115,7 @@ def parse_from_links(job_links, source_url=''):
 
         items.append({
             'title': job_title[:200],
-            'company': company or '待识别',
+            'company': company or extract_company_fallback(title_text) or '待识别',
             'city': city or '全国',
             'job_type': job_type,
             'salary_min': sal_min,

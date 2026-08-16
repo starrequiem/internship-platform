@@ -25,6 +25,16 @@ cd .. && python server.py
 cd server/scrapers && python scraper.py
 ```
 
+## 批量导入（后台发布接口）
+
+```
+# 爬虫数据 → CSV → 后台导入（联动）
+cd server/scrapers && python export_and_push.py --push
+
+# 或后台手动上传：管理后台 → 发布实习 → 批量导入 CSV/Excel
+# 表头：岗位名称,公司名称,工作城市,岗位类型（必填）+ 其余选填
+```
+
 ## 网站维护
 
 ```
@@ -57,13 +67,15 @@ MySQL: localhost:3306 / internship_platform / root / 200619
 ```
 ├── index.html          # 首页·实习列表+筛选+翻页
 ├── detail.html         # 实习详情·联系信息+收藏+举报
-├── publish.html        # 发布实习
 ├── search.html         # 搜索
 ├── login.html          # 登录
 ├── register.html       # 注册(验证码)
 ├── profile.html        # 个人主页·分享+收藏
 ├── edit.html           # 编辑资料·修改密码
-├── admin/index.html    # 管理后台·仪表盘+一键下架
+├── about.html          # 关于我们·免责·联系
+├── terms.html          # 用户协议
+├── privacy.html        # 隐私政策
+├── admin/index.html    # 管理后台·仪表盘+发布实习+批量导入+反馈管理+一键下架
 ├── js/                 # api.js auth.js components.js
 ├── css/style.css       # 全局样式
 ├── server/             # Express后端

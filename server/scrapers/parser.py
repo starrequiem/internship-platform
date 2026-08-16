@@ -4,7 +4,7 @@
 import re, json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 
-from config import CLASSIFY_RULES, CITIES, COMPANIES
+from config import CLASSIFY_RULES, CITIES, COMPANIES, extract_company_fallback
 
 RAW_DIR = os.path.join(os.path.dirname(__file__), '..', 'scraped_data')
 PARSED_DIR = os.path.join(os.path.dirname(__file__), '..', 'scraped_data', 'parsed')
@@ -62,6 +62,8 @@ def extract_from_block(text, source_name=''):
         if comp.lower() in text.lower():
             item['company'] = comp
             break
+    if not item['company']:
+        item['company'] = extract_company_fallback(text)
 
     # 2. 提取城市
     found_cities = [c for c in CITIES if c in text]

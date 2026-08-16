@@ -123,6 +123,21 @@ CREATE TABLE thanks (
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
+-- 9. 反馈/举报表
+CREATE TABLE reports (
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id       BIGINT NOT NULL,
+    internship_id BIGINT NOT NULL,
+    type          ENUM('duplicate','error','outdated','other') DEFAULT 'other',
+    message       TEXT,
+    status        ENUM('pending','reviewed','resolved') DEFAULT 'pending',
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_status (status),
+    FOREIGN KEY (user_id)       REFERENCES users(id)       ON DELETE CASCADE,
+    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- ========== 预置标签 ==========
 INSERT INTO tags (name) VALUES
 ('React'),('Vue'),('TypeScript'),('JavaScript'),('Node.js'),
