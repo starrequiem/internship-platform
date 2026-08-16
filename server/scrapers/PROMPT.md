@@ -1,31 +1,19 @@
 # 爬虫提示词
 
-> 任何 AI 可直接调用以下命令来抓取实习数据
+> 任何 AI 可直接调用以下命令抓取实习数据（多站点）
 
-## 全量抓取
-
-```
-运行 server/scrapers/scraper.py，从牛客网6个城市列表页收集链接，
-逐条访问详情页提取完整职位描述、任职要求、技术标签，
-自动入库到 MySQL internship_platform。
-```
-
-## 分步执行
+## 站点抓取（直接入库）
 
 ```
 cd server/scrapers
 
-# 1. 只抓取列表页文本
-python targeted_scraper.py
-
-# 2. 只解析已抓取的文本
-python nowcoder_parser.py
-
-# 3. 只入库已解析的数据
-python inserter.py
-
-# 4. 补充详情页数据（描述+要求）
-python enrich_details.py
+python scraper.py --site nowcoder   # 牛客汇总（列表页收集链接→详情页）
+python scrape_meituan.py            # 美团（公开 API）
+python scrape_alibaba.py            # 阿里（XSRF-TOKEN + batchId）
+python scrape_xiaohongshu.py        # 小红书（SPA 宿主免鉴权 API）
+python scrape_tencent.py            # 腾讯（searchPosition 分页）
+python scrape_huawei.py             # 华为（session + Referer，jobType=3）
+python scrape_bytedance.py          # 字节（反爬强，仅首屏）
 ```
 
 ## 数据推送后台（联动）
@@ -38,14 +26,25 @@ python export_and_push.py
 python export_and_push.py --push
 ```
 
+## 大厂整页分割
+
+```
+python segment_company.py   # 字节整页文本按「职位ID」边界分割入库
+```
+
+## 配置说明
+
+- `sites/nowcoder.py` — 牛客配置
+- `sites/default_site.py` — 大厂通用（整页→AI 分割）
+- `extract.py` — 详情页「职位描述/任职要求」边界分割（split_detail）
+- `config.py` — 站点列表、公司名兜底提取、分类规则
+
+各站 API 逆向参考：github.com/HA7CH/job-pro（meituan/alibaba/huawei/xiaohongshu/tencent/bytedance .ts）
+
 ## 数据库连接
 
 ```
-MySQL: localhost:3306
-Database: internship_platform
-User: root
-Password: 200619
-Charset: utf8mb4
+MySQL: localhost:3306 / internship_platform / root / 200619 / utf8mb4
 ```
 
 ## 牛客网URL规则
@@ -54,3 +53,9 @@ Charset: utf8mb4
 列表页: https://www.nowcoder.com/jobs/intern/center?recruitType=2&city=北京
 详情页: https://www.nowcoder.com/jobs/detail/{jobId}
 ```
+
+## 待优化
+
+- 牛客列表页每城市固定约 20 条（分页未接，未点「下一页」）
+- 字节整页分割 title/company 偶有错位
+- requirements 依赖详情页（列表页没有）
