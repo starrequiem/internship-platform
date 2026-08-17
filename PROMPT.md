@@ -43,7 +43,7 @@ python scrape_alibaba.py            # 阿里（API，需 XSRF-TOKEN）
 python scrape_xiaohongshu.py        # 小红书（API，SPA 宿主免鉴权）
 python scrape_tencent.py            # 腾讯（API，分页）
 python scrape_huawei.py             # 华为（API，需 session+Referer）
-python scrape_bytedance.py          # 字节（反爬强，仅首屏）
+python scrape_bytedance.py          # 字节（API + CSRF token）
 python export_and_push.py --push    # 导出 CSV 并推送后台导入接口
 ```
 
@@ -101,15 +101,23 @@ MySQL: localhost:3306 / internship_platform / root / 200619
 
 ## 下次工作开展
 
-### 1. 文本爬取分割有待优化
-- 牛客/字节的整页文本分割仍不准：title/company 偶有错位、requirements 提取不全
-- 待优化 `extract.py`（split_detail 边界识别）、`segment_company.py`（字节整页分割）
-- 可引入 AI 分割兜底（`ai_parse.py` + `AI_PARSE_PROMPT.md` 已具备框架）
+### 1. ✅ 文本爬取分割优化（已完成 2026-08-17）
+- `extract.py`：页尾噪音截断、无标题描述边界识别、修复「职位详情页」误判、投递时间提取
+- `segment_company.py`：字节整页描述只取职责列表、去页尾导航/页码
+- `config.py`：公司名兜底支持括号/英文、去除·HR后缀
+- 新增 `apply_time`（投递时间）字段贯通 DB/爬虫/API/前端，无投递时间显示「详见原页面」
+- 牛客列表分页翻页、字节 API 增加 CSRF token 适配
 
 ### 2. 封装上线公网
 - 当前仅本地开发（localhost:8080 / 3000）
 - 待做：环境变量管理（DB 密码、JWT 密钥移出代码）、HTTPS、域名、进程守护（pm2）
+- 前端 `python server.py` 单线程，上线前建议换 nginx / http-server
 
 ### 3. 云服务器搭建
 - 选型 + 部署：云服务器（MySQL 8.0 / Node / Python / Playwright 依赖）
 - Nginx 反向代理前后端、定时爬虫任务、数据库备份
+
+### 4. 已知数据/爬取问题
+- 牛客「去官网投」类岗位真实雇主未知（company 标记为「待识别」）
+- 华为校招淡季岗位极少（季节开放后重跑即可）
+- AI 分割兜底框架已具备（`ai_parse.py`），尚未接入实际爬取流程

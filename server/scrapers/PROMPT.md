@@ -13,7 +13,7 @@ python scrape_alibaba.py            # 阿里（XSRF-TOKEN + batchId）
 python scrape_xiaohongshu.py        # 小红书（SPA 宿主免鉴权 API）
 python scrape_tencent.py            # 腾讯（searchPosition 分页）
 python scrape_huawei.py             # 华为（session + Referer，jobType=3）
-python scrape_bytedance.py          # 字节（反爬强，仅首屏）
+python scrape_bytedance.py          # 字节（API + CSRF token）
 ```
 
 ## 数据推送后台（联动）
@@ -56,6 +56,6 @@ MySQL: localhost:3306 / internship_platform / root / 200619 / utf8mb4
 
 ## 待优化
 
-- 牛客列表页每城市固定约 20 条（分页未接，未点「下一页」）
-- 字节整页分割 title/company 偶有错位
-- requirements 依赖详情页（列表页没有）
+- 牛客「去官网投」类岗位真实雇主未知（company 标记为「待识别」）
+- 华为校招淡季岗位极少（jobType=3 仅个位数，季节开放后自动增多）
+- 各公司 API 接口可能变更，需按需维护（字节已适配 CSRF token）
