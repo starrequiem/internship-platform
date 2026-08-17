@@ -50,7 +50,7 @@ def classify(job_type):
     if any(k in job_type for k in HR_KW):
         return '人力资源'
     if any(k in job_type for k in FUNC_KW):
-        return '职能'
+        return '法务合规'
     return '技术开发'
 
 

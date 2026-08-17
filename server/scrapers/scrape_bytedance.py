@@ -25,6 +25,8 @@ SCOPE_RECRUIT = {'intern': ['202'], 'campus': ['201'], 'all': ['201', '202']}
 def classify(category):
     if not category:
         return '技术开发'
+    if '算法' in category or 'AI' in category or '机器学习' in category:
+        return '算法/AI'
     if '产品' in category:
         return '产品经理'
     if '设计' in category or 'UI' in category or 'UX' in category:

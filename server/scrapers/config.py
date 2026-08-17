@@ -181,6 +181,16 @@ JOB_TYPE_TO_MAJOR = {
     '职能支持': '不限专业',
 }
 
+
+def classify_job_type(title):
+    """按标题关键词分类岗位类型（遍历 CLASSIFY_RULES['job_type']），所有爬虫共用"""
+    title = (title or '').lower()
+    for jt, kws in CLASSIFY_RULES['job_type'].items():
+        for kw in kws:
+            if kw.lower() in title:
+                return jt
+    return '技术开发'
+
 COMPANIES = [
     '字节跳动','腾讯','阿里巴巴','美团','华为','百度','京东',
     '小红书','快手','网易','滴滴','哔哩哔哩','拼多多',

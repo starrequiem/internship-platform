@@ -19,22 +19,25 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from playwright.sync_api import sync_playwright
 from extract import split_detail, deadline_from_apply_time
-from config import CITIES, extract_company_fallback
+from config import CITIES, extract_company_fallback, classify_job_type
 from inserter import insert_item, get_conn
 
 LIST_URL = 'https://www.shixiseng.com/interns'
 DETAIL = 'https://www.shixiseng.com/intern/{}'
 
 
-def collect_links(page, max_items=100):
-    """列表页滚动收集详情链接（去重，保留顺序）"""
+def collect_links(page, max_items=120):
+    """列表页翻页收集详情链接（点数字分页 li.number，去重）"""
     urls = []
     try:
         page.goto(LIST_URL, wait_until='domcontentloaded', timeout=40000)
         page.wait_for_timeout(3000)
-        for _ in range(15):  # 滚动加载更多
-            page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
-            page.wait_for_timeout(1200)
+        page_num = 0
+        while len(urls) < max_items and page_num < 30:
+            page_num += 1
+            for _ in range(4):
+                page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+                page.wait_for_timeout(500)
             batch = page.evaluate('''() => {
                 const out = [], seen = new Set();
                 document.querySelectorAll('a[href*="/intern/inn_"]').forEach(a => {
@@ -46,8 +49,19 @@ def collect_links(page, max_items=100):
             for u in batch:
                 if u not in urls:
                     urls.append(u)
-            if len(urls) >= max_items:
+            # 点下一页（active 的下一个数字，或 next 按钮）
+            clicked = page.evaluate('''() => {
+                const lis = [...document.querySelectorAll('ul li.number')];
+                const idx = lis.findIndex(li => li.classList.contains('active'));
+                const next = idx >= 0 ? lis[idx + 1] : null;
+                if (next) { next.click(); return true; }
+                const btn = document.querySelector('.btn-next, [class*="btn-next"]');
+                if (btn) { btn.click(); return true; }
+                return false;
+            }''')
+            if not clicked:
                 break
+            page.wait_for_timeout(2500)
     except Exception as e:
         print(f'  列表抓取失败: {e}')
     return urls[:max_items]
@@ -115,7 +129,6 @@ def scrape_detail(page, path):
             result['deadline'] = deadline_from_apply_time(dl.group(1))
 
         # 岗位类型（标题关键词兜底）
-        from nowcoder_parser import classify_job_type
         result['job_type'] = classify_job_type(result['title'])
     except Exception as e:
         print(f'  详情抓取异常: {str(e)[:60]}')

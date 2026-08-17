@@ -3,7 +3,7 @@
 """
 import re, json, os, sys
 sys.path.insert(0, os.path.dirname(__file__))
-from config import COMPANIES, CITIES, CLASSIFY_RULES, extract_company_fallback
+from config import COMPANIES, CITIES, extract_company_fallback, classify_job_type
 
 def parse_nowcoder_text(text):
     """从牛客网文本提取结构化数据"""
@@ -58,12 +58,6 @@ def extract_job_entry(lines, salary_idx, salary_match, is_mianyi):
     if item['title']: item['job_type'] = classify_job_type(item['title'])
     if item['title'] or item['company']: return item
     return None
-
-def classify_job_type(title):
-    for job_type, keywords in CLASSIFY_RULES['job_type'].items():
-        for kw in keywords:
-            if kw.lower() in title.lower(): return job_type
-    return '技术开发'
 
 def parse_from_links(job_links, source_url=''):
     """
