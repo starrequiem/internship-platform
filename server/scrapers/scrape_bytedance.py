@@ -49,21 +49,45 @@ def fetch_jobs(scope='intern', max_posts=500, page_size=100):
         page.goto(CAMPUS_PAGE, wait_until='networkidle', timeout=40000)
         page.wait_for_timeout(3000)
 
+        # 字节 API 现已要求 x-csrf-token 头，先获取 token
+        token = page.evaluate('''async () => {
+            const r = await fetch('https://jobs.bytedance.com/api/v1/csrf/token', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({'portal_entrance':1})
+            });
+            const j = await r.json();
+            return (j && j.data && j.data.token) || '';
+        }''')
+        if not token:
+            print('  获取 CSRF token 失败，字节 API 可能已升级')
+            browser.close()
+            return items
+
         for rec_id in recruit_ids:
             offset = 0
             while len(items) < max_posts:
                 body = {'keyword': '', 'limit': page_size, 'offset': offset,
-                        'portal_type': 3, 'portal_entrance': 1, 'language': 'zh',
-                        'recruitment_id_list': [rec_id]}
-                data = page.evaluate('''async (body) => {
-                    const r = await fetch('https://jobs.bytedance.com/api/v1/search/job/posts', {
+                        'job_category_id_list': [], 'tag_id_list': [],
+                        'location_code_list': [], 'subject_id_list': [],
+                        'recruitment_id_list': [rec_id], 'portal_type': 3,
+                        'job_function_id_list': [], 'storefront_id_list': [],
+                        'portal_entrance': 1}
+                qs = ('keyword=&limit={limit}&offset={offset}&job_category_id_list=&tag_id_list='
+                      '&location_code_list=&subject_id_list=&recruitment_id_list={rec}'
+                      '&portal_type=3&job_function_id_list=&storefront_id_list=&portal_entrance=1'
+                      ).format(limit=page_size, offset=offset, rec=rec_id)
+                data = page.evaluate('''async (args) => {
+                    const r = await fetch('https://jobs.bytedance.com/api/v1/search/job/posts?' + args.qs, {
                         method: 'POST',
-                        headers: {'Content-Type':'application/json','portal-channel':'campus','portal-platform':'pc','website-path':'campus'},
-                        body: JSON.stringify(body)
+                        headers: {'Content-Type':'application/json',
+                                  'x-csrf-token': args.token,
+                                  'portal-channel':'campus','portal-platform':'pc','website-path':'campus'},
+                        body: JSON.stringify(args.body)
                     });
                     const t = await r.text();
                     try { return JSON.parse(t); } catch(e) { return {code:-1, err:t.slice(0,100)}; }
-                }''', body)
+                }''', {'qs': qs, 'token': token, 'body': body})
                 if data.get('code') != 0:
                     print(f'  API异常: {data.get("err", data.get("code"))}')
                     break

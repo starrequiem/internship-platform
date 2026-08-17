@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from playwright.sync_api import sync_playwright
 from config import COMPANIES, CITIES, extract_company_fallback, clean_company
-from extract import split_detail
+from extract import split_detail, extract_apply_time, deadline_from_apply_time
 from sites import get_site, ALL_SITES
 from inserter import insert_item, get_conn
 
@@ -34,7 +34,7 @@ os.makedirs(EXPORT_DIR, exist_ok=True)
 CANONICAL_HEADERS = [
     '岗位名称', '公司名称', '工作城市', '岗位类型', '详细地址',
     '最低薪资', '最高薪资', '学历要求', '每周出勤', '实习时长',
-    '面向年级', '面向专业', '招聘人数', '截止日期',
+    '面向年级', '面向专业', '招聘人数', '截止日期', '投递时间',
     '职位描述', '任职要求', '联系信息', '标签',
 ]
 
@@ -68,24 +68,42 @@ def _collect_one_list(page, url, site):
     jobs = []
     try:
         page.goto(url, wait_until='networkidle', timeout=60000)
-        for _ in range(15):
-            page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
-            page.wait_for_timeout(1000)
         pat = site.get('link_pattern') or ''
-        jobs = page.evaluate('''(pat) => {
-            const out = [], seen = new Set();
-            document.querySelectorAll('a[href]').forEach(a => {
-                const href = a.getAttribute('href') || '';
-                if (!href) return;
-                const full = href.startsWith('http') ? href : location.origin + href;
-                if (pat && href.indexOf(pat) < 0) return;
-                if (!seen.has(full)) {
-                    seen.add(full);
-                    out.push({url: full, text: (a.innerText || '').trim()});
+        page_idx = 0
+        while page_idx < 50:  # 分页安全上限
+            page_idx += 1
+            # 滚动加载当前页
+            for _ in range(8):
+                page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+                page.wait_for_timeout(600)
+            # 收集当前页链接
+            batch = page.evaluate('''(pat) => {
+                const out = [], seen = new Set();
+                document.querySelectorAll('a[href]').forEach(a => {
+                    const href = a.getAttribute('href') || '';
+                    if (!href) return;
+                    const full = href.startsWith('http') ? href : location.origin + href;
+                    if (pat && href.indexOf(pat) < 0) return;
+                    if (!seen.has(full)) {
+                        seen.add(full);
+                        out.push({url: full, text: (a.innerText || '').trim()});
+                    }
+                });
+                return out;
+            }''', pat)
+            jobs += batch
+            # 尝试点「下一页」（Element UI 分页：.btn-next），翻到底后 disabled 则停止
+            clicked = page.evaluate('''() => {
+                const btn = document.querySelector('.el-pagination .btn-next');
+                if (!btn || btn.disabled || btn.classList.contains('disabled') || btn.classList.contains('is-disabled')) {
+                    return false;
                 }
-            });
-            return out;
-        }''', pat)
+                btn.click();
+                return true;
+            }''')
+            if not clicked:
+                break
+            page.wait_for_timeout(2500)
     except Exception as e:
         print(f'    列表抓取失败: {e}')
     print(f'    收集 {len(jobs)} 个链接')
@@ -99,7 +117,7 @@ def scrape_detail(page, job, site):
         'title': '', 'company': '', 'city': '', 'job_type': '技术开发',
         'salary_min': None, 'salary_max': None, 'education': '本科及以上',
         'days_per_week': 4, 'duration_months': 3, 'headcount': 1,
-        'deadline': None, 'description': '', 'requirements': '', 'tags': [],
+        'deadline': None, 'apply_time': '', 'description': '', 'requirements': '', 'tags': [],
         'contact_info': '', 'url': url,
     }
     listing = job.get('text', '')
@@ -128,6 +146,11 @@ def scrape_detail(page, job, site):
         page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
         page.wait_for_timeout(800)
         body = page.evaluate('() => document.body ? document.body.innerText : ""') or ''
+
+        # 投递时间：区间原文存入 apply_time，末尾日期解析为 deadline（截止日期）
+        result['apply_time'] = extract_apply_time(body)
+        if result['apply_time']:
+            result['deadline'] = deadline_from_apply_time(result['apply_time'])
 
         # 标题（优先页面 h1）
         h1 = page.evaluate('''() => {
@@ -204,6 +227,7 @@ def export_csv(items, path):
                 '面向专业': it.get('target_major', ''),
                 '招聘人数': it.get('headcount', ''),
                 '截止日期': it.get('deadline', ''),
+                '投递时间': it.get('apply_time', ''),
                 '职位描述': it.get('description', ''),
                 '任职要求': it.get('requirements', ''),
                 '联系信息': it.get('contact_info', ''),

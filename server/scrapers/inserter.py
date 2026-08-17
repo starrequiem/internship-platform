@@ -58,6 +58,7 @@ def insert_item(item, default_poster_id=1):
             parts.append('💡 请在招聘网站搜索「' + company + ' ' + title + '」查看原文和投递方式')
         contact_info = '\n'.join(parts)
     deadline   = item.get('deadline') or None
+    apply_time = item.get('apply_time') or ''
     headcount  = item.get('headcount') or 1
 
     if not title or not company:
@@ -68,15 +69,16 @@ def insert_item(item, default_poster_id=1):
 
     # 去重: title + company + city 三字段联合唯一
     cur.execute(
-        'SELECT id, description, requirements, deadline, salary_min, salary_max FROM internships WHERE title = %s AND company = %s AND city = %s LIMIT 1',
+        'SELECT id, description, requirements, deadline, apply_time, salary_min, salary_max FROM internships WHERE title = %s AND company = %s AND city = %s LIMIT 1',
         [title, company, city]
     )
     existing = cur.fetchone()
 
     if existing:
-        eid, old_desc, old_reqs, old_deadline, old_min, old_max = existing
+        eid, old_desc, old_reqs, old_deadline, old_apply_time, old_min, old_max = existing
         old_desc = old_desc or ''
         old_reqs = old_reqs or ''
+        old_apply_time = old_apply_time or ''
 
         # 二次校验: 如果新旧描述差异很大(>50%不同), 视为不同岗位
         if desc and old_desc:
@@ -95,6 +97,8 @@ def insert_item(item, default_poster_id=1):
                 parts.append('requirements = %s'); vals.append(reqs[:3000])
             if deadline and not old_deadline:
                 parts.append('deadline = %s'); vals.append(deadline)
+            if apply_time and not old_apply_time:
+                parts.append('apply_time = %s'); vals.append(apply_time)
             if (salary_min or salary_max) and not (old_min or old_max):
                 parts.append('salary_min = %s, salary_max = %s')
                 vals.extend([salary_min, salary_max])
@@ -116,12 +120,12 @@ def insert_item(item, default_poster_id=1):
         cur.execute(
             '''INSERT INTO internships
                (poster_id, title, company, city, job_type, salary_min, salary_max,
-                education, days_per_week, duration_months, headcount, deadline,
+                education, days_per_week, duration_months, headcount, deadline, apply_time,
                 description, requirements, contact_info, status)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
             [default_poster_id, title, company, city, job_type,
              salary_min, salary_max, education,
-             4, 3, headcount, deadline,
+             4, 3, headcount, deadline, apply_time,
              desc[:5000], reqs[:3000],
              contact_info[:2000], 'active']
         )

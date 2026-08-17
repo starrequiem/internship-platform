@@ -46,6 +46,7 @@ const HEADER_MAP = {
   '面向专业': 'target_major', '专业': 'target_major', 'target_major': 'target_major',
   '招聘人数': 'headcount', '人数': 'headcount', 'headcount': 'headcount',
   '截止日期': 'deadline', '投递截止': 'deadline', 'deadline': 'deadline',
+  '投递时间': 'apply_time', 'apply_time': 'apply_time',
   '职位描述': 'description', '岗位描述': 'description', '描述': 'description', 'description': 'description',
   '任职要求': 'requirements', '岗位要求': 'requirements', '要求': 'requirements', 'requirements': 'requirements',
   '联系信息': 'contact_info', '联系方式': 'contact_info', '投递方式': 'contact_info', 'contact_info': 'contact_info',
@@ -130,17 +131,17 @@ function mapRow(row) {
 async function insertInternship(posterId, d) {
   const { title, company, city, district, job_type, salary_min, salary_max,
           education, days_per_week, duration_months, target_grade, target_major,
-          headcount, deadline, description, requirements, contact_info, tags } = d;
+          headcount, deadline, apply_time, description, requirements, contact_info, tags } = d;
   const [result] = await pool.query(
     `INSERT INTO internships (poster_id, title, company, city, district, job_type, salary_min, salary_max,
       education, days_per_week, duration_months, target_grade, target_major,
-      headcount, deadline, description, requirements, contact_info)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+      headcount, deadline, apply_time, description, requirements, contact_info)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [posterId, title, company, city, district || null, job_type,
      salary_min || null, salary_max || null,
      education || '本科及以上', days_per_week || 4, duration_months || 3,
      target_grade || null, target_major || null,
-     headcount || 1, deadline || null, description || null, requirements || null,
+     headcount || 1, deadline || null, apply_time || null, description || null, requirements || null,
      contact_info || null]
   );
   if (tags && tags.length) {

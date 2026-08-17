@@ -43,6 +43,7 @@ CREATE TABLE internships (
     target_major    VARCHAR(500),
     headcount       INT          DEFAULT 1,
     deadline        DATE,
+    apply_time      VARCHAR(100) NULL COMMENT '投递时间区间原文',
     description     TEXT,
     requirements    TEXT,
     apply_url       VARCHAR(500),

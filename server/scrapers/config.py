@@ -162,10 +162,14 @@ COMPANIES = [
 # 公司名误匹配黑名单（含「技术/科技」等后缀但不是公司名的词）
 _COMPANY_FALSE = {'高新技术', '人工智能', '企业服务', '互联网', '大数据', '信息技术', '通信电子'}
 
+# 公司名末尾常带的招聘者/岗位后缀（「博世(中国)投资有限公司·HR」→ 去掉 ·HR）
+_RECRUITER_SUFFIX = re.compile(r'[·\- ](?:HR|hr|Recruiter|招聘者|招聘|人事|项目经理|负责人|经理|主管)\s*$')
+
 
 def clean_company(name):
-    """去掉公司名开头的城市前缀"""
+    """去掉公司名开头的城市前缀 + 结尾的招聘者后缀（·HR / ·项目经理 等）"""
     name = name.strip()
+    name = _RECRUITER_SUFFIX.sub('', name).strip()
     for city in CITIES + ['远程']:
         if name.startswith(city):
             name = name[len(city):]
@@ -180,7 +184,8 @@ def extract_company_fallback(text):
     if not text:
         return ''
     # 1. 完整法律名称（最强信号，优先）
-    m = re.search(r'([一-龥]{2,20}(?:股份有限公司|有限责任公司|有限公司))', text)
+    #    支持「博世(中国)投资有限公司」这类带括号/英文/数字的公司全称
+    m = re.search(r'([A-Za-z0-9一-龥()（）]{2,40}(?:股份有限公司|有限责任公司|有限公司))', text)
     if m:
         return clean_company(m.group(1))
     # 2. 常见公司后缀短语

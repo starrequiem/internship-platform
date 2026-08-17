@@ -93,6 +93,10 @@
         <h2>📬 联系信息</h2>
         <div style="font-size:14px;line-height:1.8;color:#374151;white-space:pre-wrap">${item.contact_info ? escHtml(item.contact_info) : '发布者未提供联系信息'}</div>
       </div>
+      <div class="detail-section" style="margin-top:16px">
+        <h2>📅 投递时间</h2>
+        <div style="font-size:14px;line-height:1.8;color:#374151;white-space:pre-wrap">${escHtml(item.apply_time || '详见原页面')}</div>
+      </div>
       <div class="detail-actions">
         <button class="btn-save" id="btnFav" onclick="toggleFav(${item.id})" style="display:inline-flex;align-items:center;justify-content:center">⭐ 收藏</button>
         <button class="btn-save" id="btnReport" onclick="showReportModal(${item.id})" style="display:inline-flex;align-items:center;justify-content:center;background:#fef2f2;border-color:#ef4444;color:#dc2626;margin-left:auto">🚩 反馈/举报</button>

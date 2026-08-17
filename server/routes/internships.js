@@ -134,7 +134,7 @@ router.post('/', requireAdmin, async (req, res) => {
   try {
     const { title, company, city, district, job_type, salary_min, salary_max,
             education, days_per_week, duration_months, target_grade, target_major,
-            headcount, deadline, description, requirements, contact_info, tags } = req.body;
+            headcount, deadline, apply_time, description, requirements, contact_info, tags } = req.body;
 
     if (!title || !company || !city || !job_type) {
       return res.status(400).json({ error: '必填字段：title, company, city, job_type' });
@@ -143,13 +143,13 @@ router.post('/', requireAdmin, async (req, res) => {
     const [result] = await pool.query(
       `INSERT INTO internships (poster_id, title, company, city, district, job_type, salary_min, salary_max,
         education, days_per_week, duration_months, target_grade, target_major,
-        headcount, deadline, description, requirements, contact_info)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        headcount, deadline, apply_time, description, requirements, contact_info)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [req.user.id, title, company, city, district || null, job_type,
        salary_min || null, salary_max || null,
        education || '本科及以上', days_per_week || 4, duration_months || 3,
        target_grade || null, target_major || null,
-       headcount || 1, deadline || null, description || null, requirements || null,
+       headcount || 1, deadline || null, apply_time || null, description || null, requirements || null,
        contact_info || null]
     );
 
@@ -182,7 +182,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
 
     const { title, company, city, district, job_type, salary_min, salary_max,
             education, days_per_week, duration_months, target_grade, target_major,
-            headcount, deadline, description, requirements, contact_info, tags } = req.body;
+            headcount, deadline, apply_time, description, requirements, contact_info, tags } = req.body;
 
     if (!title || !company || !city || !job_type) {
       return res.status(400).json({ error: '必填字段：title, company, city, job_type' });
@@ -193,14 +193,14 @@ router.put('/:id', requireAdmin, async (req, res) => {
         title = ?, company = ?, city = ?, district = ?, job_type = ?,
         salary_min = ?, salary_max = ?, education = ?, days_per_week = ?,
         duration_months = ?, target_grade = ?, target_major = ?,
-        headcount = ?, deadline = ?, description = ?, requirements = ?,
+        headcount = ?, deadline = ?, apply_time = ?, description = ?, requirements = ?,
         contact_info = ?
        WHERE id = ?`,
       [title, company, city, district || null, job_type,
        salary_min || null, salary_max || null,
        education || '本科及以上', days_per_week || 4, duration_months || 3,
        target_grade || null, target_major || null,
-       headcount || 1, deadline || null, description || null, requirements || null,
+       headcount || 1, deadline || null, apply_time || null, description || null, requirements || null,
        contact_info || null,
        req.params.id]
     );

@@ -19,11 +19,36 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.path.insert(0, os.path.dirname(__file__))
 
 from config import CITIES
+from extract import _is_list_item
 from inserter import insert_item, get_conn
 
 RAW_DIR = os.path.join(os.path.dirname(__file__), '..', 'scraped_data', 'raw_pages')
 PARSED_DIR = os.path.join(os.path.dirname(__file__), '..', 'scraped_data', 'parsed_ai')
 SOURCE_URL = 'https://jobs.bytedance.com/campus/position'
+
+# 职责编号列表之前的通用说明标签（团队介绍/项目说明等，非职位描述本身）
+NOISE_LABELS = ['团队介绍', '日常实习', 'ByteIntern', '项目说明', '课题介绍', '导师介绍', '项目亮点']
+
+# 字节页尾导航（仅出现在页脚，用于截断最后一个岗位之后的内容）
+FOOTER_KEYS = ['联系我们', '相关网站', '候选人反馈平台', '官网使用体验反馈', '字节跳动 Seed']
+
+
+def _extract_desc(lines):
+    """从某岗位正文行里提取「职位描述」：优先取职责编号列表（1、2、3…），
+    跳过前置的团队介绍/项目说明等噪音，并去掉尾部的分页页码（如 1/2/3…752）。"""
+    start = None
+    for i, l in enumerate(lines):
+        if _is_list_item(l):
+            start = i
+            break
+    if start is None:
+        out = [l for l in lines if not any(n in l for n in NOISE_LABELS)]
+    else:
+        out = list(lines[start:])
+    # 去掉尾部分页页码（纯数字行）
+    while out and re.fullmatch(r'\d{1,4}', out[-1]):
+        out.pop()
+    return '\n'.join(out).strip()
 
 
 def parse_meta(meta):
@@ -54,6 +79,13 @@ def classify(head):
 
 def segment(text):
     lines = [l.strip() for l in text.split('\n') if l.strip()]
+    # 截断页尾导航，避免最后一个岗位的描述混入页脚
+    cut = len(lines)
+    for i, l in enumerate(lines):
+        if any(k in l for k in FOOTER_KEYS):
+            cut = i
+            break
+    lines = lines[:cut]
     meta_idx = [i for i, l in enumerate(lines) if '职位 ID' in l]
     items = []
     for k, mi in enumerate(meta_idx):
@@ -61,10 +93,7 @@ def segment(text):
         head, jid, cities, is_intern = parse_meta(lines[mi])
         desc_start = mi + 1
         desc_end = meta_idx[k + 1] - 1 if k + 1 < len(meta_idx) else len(lines)
-        desc = '\n'.join(
-            l for l in lines[desc_start:desc_end]
-            if '日常实习：' not in l and '项目说明' not in l
-        )
+        desc = _extract_desc(lines[desc_start:desc_end])
         items.append({
             'title': title,
             'company': '字节跳动',
