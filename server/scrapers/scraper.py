@@ -67,7 +67,7 @@ def collect_links(page, site):
 def _collect_one_list(page, url, site):
     jobs = []
     try:
-        page.goto(url, wait_until='networkidle', timeout=60000)
+        page.goto(url, wait_until='domcontentloaded', timeout=60000)
         pat = site.get('link_pattern') or ''
         page_idx = 0
         while page_idx < 50:  # 分页安全上限

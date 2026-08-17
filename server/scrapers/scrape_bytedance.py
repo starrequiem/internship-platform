@@ -46,7 +46,7 @@ def fetch_jobs(scope='intern', max_posts=500, page_size=100):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
-        page.goto(CAMPUS_PAGE, wait_until='networkidle', timeout=40000)
+        page.goto(CAMPUS_PAGE, wait_until='domcontentloaded', timeout=40000)
         page.wait_for_timeout(3000)
 
         # 字节 API 现已要求 x-csrf-token 头，先获取 token
