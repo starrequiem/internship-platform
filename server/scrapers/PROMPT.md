@@ -14,6 +14,8 @@ python scrape_xiaohongshu.py        # 小红书（SPA 宿主免鉴权 API）
 python scrape_tencent.py            # 腾讯（searchPosition 分页）
 python scrape_huawei.py             # 华为（session + Referer，jobType=3）
 python scrape_bytedance.py          # 字节（API + CSRF token）
+python scrape_netease.py            # 网易（API，campus.163.com + 游戏）
+python scrape_shixiseng.py          # 实习僧（列表+详情 SSR）
 ```
 
 ## 数据推送后台（联动）
@@ -59,3 +61,4 @@ MySQL: localhost:3306 / internship_platform / root / 200619 / utf8mb4
 - 牛客「去官网投」类岗位真实雇主未知（company 标记为「待识别」）
 - 华为校招淡季岗位极少（jobType=3 仅个位数，季节开放后自动增多）
 - 各公司 API 接口可能变更，需按需维护（字节已适配 CSRF token）
+- Boss直聘：需登录+滑块验证码，无登录拿不到岗位，暂未接入

@@ -44,6 +44,8 @@ python scrape_xiaohongshu.py        # 小红书（API，SPA 宿主免鉴权）
 python scrape_tencent.py            # 腾讯（API，分页）
 python scrape_huawei.py             # 华为（API，需 session+Referer）
 python scrape_bytedance.py          # 字节（API + CSRF token）
+python scrape_netease.py            # 网易（API，campus.163.com + 游戏）
+python scrape_shixiseng.py          # 实习僧（列表+详情 SSR）
 python export_and_push.py --push    # 导出 CSV 并推送后台导入接口
 ```
 
