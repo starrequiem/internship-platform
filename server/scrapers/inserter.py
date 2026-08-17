@@ -15,6 +15,10 @@ if os.path.exists(ENV_FILE):
 
 import pymysql
 
+# 岗位类型 → 专业方向 映射（自动填充 target_major）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import JOB_TYPE_TO_MAJOR
+
 # 复用同一个数据库连接
 _conn = None
 
@@ -60,6 +64,7 @@ def insert_item(item, default_poster_id=1):
     deadline   = item.get('deadline') or None
     apply_time = item.get('apply_time') or ''
     headcount  = item.get('headcount') or 1
+    target_major = item.get('target_major') or JOB_TYPE_TO_MAJOR.get(job_type, '不限专业')
 
     if not title or not company:
         return None
@@ -120,12 +125,12 @@ def insert_item(item, default_poster_id=1):
         cur.execute(
             '''INSERT INTO internships
                (poster_id, title, company, city, job_type, salary_min, salary_max,
-                education, days_per_week, duration_months, headcount, deadline, apply_time,
+                education, days_per_week, duration_months, headcount, deadline, apply_time, target_major,
                 description, requirements, contact_info, status)
-               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+               VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
             [default_poster_id, title, company, city, job_type,
              salary_min, salary_max, education,
-             4, 3, headcount, deadline, apply_time,
+             4, 3, headcount, deadline, apply_time, target_major,
              desc[:5000], reqs[:3000],
              contact_info[:2000], 'active']
         )
