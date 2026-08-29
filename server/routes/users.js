@@ -3,8 +3,7 @@ const pool = require('../db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { requireAuth } = require('../middleware/auth');
-
-const JWT_SECRET = 'internship-platform-secret';
+const { jwtSecret } = require('../config');
 
 // 内存验证码存储（开发阶段，生产换 Redis）
 const captchaStore = new Map(); // username -> { code, expires }
@@ -181,7 +180,7 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, username: user.username },
-      JWT_SECRET,
+      jwtSecret,
       { expiresIn: '7d' }
     );
 

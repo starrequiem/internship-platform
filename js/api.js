@@ -2,7 +2,9 @@
  * 实习通 · API 工具模块
  * 封装 fetch 请求，自动附带 JWT 认证头
  */
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port === '8080'
+  ? 'http://localhost:3000/api'
+  : '/api';
 
 async function api(path, options = {}) {
   const token = localStorage.getItem('token');

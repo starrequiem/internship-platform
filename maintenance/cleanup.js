@@ -12,13 +12,10 @@ const serverDir = require('path').join(__dirname, '..', 'server');
 // 从 server 目录加载模块（node_modules 在 server 里）
 const mysql = require(require('path').join(serverDir, 'node_modules', 'mysql2', 'promise'));
 require(require('path').join(serverDir, 'node_modules', 'dotenv')).config({ path: require('path').join(serverDir, '.env') });
+const { db } = require(require('path').join(serverDir, 'config'));
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '200619',
-  database: process.env.DB_NAME || 'internship_platform',
-  charset: 'utf8mb4',
+  ...db, charset: 'utf8mb4',
 });
 
 async function main() {

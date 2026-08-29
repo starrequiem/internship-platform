@@ -83,7 +83,9 @@ tr:hover td{background:rgba(99,102,241,.05)}
 </div>
 
 <script>
-const API = 'http://localhost:3000/api/admin';
+const API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port === '8080'
+  ? 'http://localhost:3000/api/admin'
+  : '/api/admin';
 var token = localStorage.getItem('admin_token');
 
 if (token) { checkToken(); }
@@ -252,7 +254,7 @@ function loadPublish() {
     '<div class="pform" style="margin-top:16px">' +
       '<h2>📥 批量导入 CSV / Excel</h2>' +
       '<p class="sub">上传格式正确的 csv / xlsx 文件，自动读取并批量入库。表头需包含：岗位名称、公司名称、工作城市、岗位类型（必填）；其余列（详细地址、最低薪资、最高薪资、学历要求、每周出勤、实习时长、面向年级、面向专业、招聘人数、截止日期、职位描述、任职要求、联系信息、标签）选填。</p>' +
-      '<div class="row"><div><label>选择文件</label><input type="file" id="pfImportFile" accept=".csv,.xlsx,.xls" style="padding:8px"></div></div>' +
+      '<div class="row"><div><label>选择文件</label><input type="file" id="pfImportFile" accept=".csv,.xlsx" style="padding:8px"></div></div>' +
       '<button class="btn-save" onclick="importInterns()" style="margin-top:4px">📥 上传并导入</button>' +
       '<div id="pfImportResult" style="margin-top:12px;font-size:13px;color:#94a3b8;white-space:pre-wrap"></div>' +
     '</div>';

@@ -5,10 +5,10 @@
 const path = require('path');
 const serverDir = path.join(__dirname, '..', 'server');
 const mysql = require(path.join(serverDir, 'node_modules', 'mysql2', 'promise'));
+const { db } = require(path.join(serverDir, 'config'));
 
 const pool = mysql.createPool({
-  host: 'localhost', user: 'root', password: '200619',
-  database: 'internship_platform', charset: 'utf8mb4',
+  ...db, charset: 'utf8mb4',
 });
 
 async function main() {

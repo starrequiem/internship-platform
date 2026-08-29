@@ -6,8 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { requireAuth } = require('../middleware/auth');
-
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+const { uploadDir: UPLOAD_DIR } = require('../config');
 
 // 确保目录存在
 ['avatars', 'logos'].forEach(dir => {

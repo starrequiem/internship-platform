@@ -6,17 +6,15 @@ const pool = require('../db');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 const path = require('path');
 const iconv = require('iconv-lite');
-
-const JWT_SECRET = 'internship-platform-admin-secret';
-
+const { adminJwtSecret } = require('../config');
 async function adminAuth(req, res, next) {
   const auth = req.headers.authorization;
   if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: '未授权' });
   try {
-    const payload = jwt.verify(auth.slice(7), JWT_SECRET);
+    const payload = jwt.verify(auth.slice(7), adminJwtSecret);
     const [[user]] = await pool.query('SELECT id, username, role FROM users WHERE id = ?', [payload.id]);
     if (!user || user.role !== 'admin') return res.status(403).json({ error: '需要管理员权限' });
     req.admin = user;
@@ -168,7 +166,7 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(401).json({ error: '用户名或密码错误' });
     if (user.role !== 'admin') return res.status(403).json({ error: '无管理员权限' });
-    const token = jwt.sign({ id: user.id, username: user.username, role: 'admin' }, JWT_SECRET, { expiresIn: '12h' });
+    const token = jwt.sign({ id: user.id, username: user.username, role: 'admin' }, adminJwtSecret, { expiresIn: '12h' });
     res.json({ token, admin: { id: user.id, username: user.username } });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -209,7 +207,7 @@ router.post('/internships', adminAuth, async (req, res) => {
   }
 });
 
-// 批量导入（csv / xlsx / xls）
+// 批量导入（csv / xlsx）
 router.post('/internships/import', adminAuth, importUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: '请上传 csv 或 excel 文件' });
@@ -226,10 +224,29 @@ router.post('/internships/import', adminAuth, importUpload.single('file'), async
         headers.forEach((h, i) => { obj[h] = cells[i] !== undefined ? cells[i] : ''; });
         return obj;
       });
+    } else if (ext === '.xlsx') {
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(req.file.buffer);
+      const sheet = workbook.worksheets[0];
+      if (!sheet || sheet.rowCount < 2) {
+        return res.status(400).json({ error: '文件为空或没有有效数据行' });
+      }
+      const headers = sheet.getRow(1).values.slice(1).map(h => String(h || '').trim());
+      rows = [];
+      sheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return;
+        const obj = {};
+        headers.forEach((header, index) => {
+          const cell = row.getCell(index + 1);
+          const value = cell.value;
+          obj[header] = value && typeof value === 'object' && !(value instanceof Date)
+            ? (value.result ?? cell.text ?? '')
+            : (value ?? '');
+        });
+        if (Object.values(obj).some(value => value !== '')) rows.push(obj);
+      });
     } else {
-      const wb = XLSX.read(req.file.buffer, { type: 'buffer', cellDates: true });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      return res.status(400).json({ error: '仅支持 .csv 或 .xlsx 文件' });
     }
     if (!rows.length) return res.status(400).json({ error: '文件为空或没有有效数据行' });
 

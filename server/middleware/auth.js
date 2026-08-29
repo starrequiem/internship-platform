@@ -2,14 +2,12 @@
  * JWT 认证中间件
  */
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'internship-platform-secret';
-
-const ADMIN_SECRET = 'internship-platform-admin-secret';
+const { jwtSecret, adminJwtSecret } = require('../config');
 
 /** 解析 token，支持用户和管理员两种密钥 */
 function parseToken(token) {
-  try { return jwt.verify(token, JWT_SECRET); } catch (_) {}
-  try { return jwt.verify(token, ADMIN_SECRET); } catch (_) { return null; }
+  try { return jwt.verify(token, jwtSecret); } catch (_) {}
+  try { return jwt.verify(token, adminJwtSecret); } catch (_) { return null; }
 }
 
 /** 强制认证：无有效 token 返回 401 */

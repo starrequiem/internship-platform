@@ -28,7 +28,7 @@ def get_conn():
         _conn = pymysql.connect(
             host=os.environ.get('DB_HOST', 'localhost'),
             user=os.environ.get('DB_USER', 'root'),
-            password=os.environ.get('DB_PASSWORD', '200619'),
+            password=os.environ.get('DB_PASSWORD', ''),
             database=os.environ.get('DB_NAME', 'internship_platform'),
             charset='utf8mb4',
             autocommit=True,

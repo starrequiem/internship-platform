@@ -1,0 +1,11 @@
+.git
+.gitignore
+.idea
+node_modules
+server/node_modules
+server/uploads
+*.log
+nul
+__pycache__
+*.pyc
+server/scraped_data
