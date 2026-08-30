@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 });
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || config.corsOrigins.includes(origin)) return callback(null, true);
+    if (!origin || config.corsOrigins.includes(origin) || /^https:\/\/internship-platform-production-80c3\.up\.railway\.app$/.test(origin)) return callback(null, true);
     const error = new Error('该请求来源未被允许');
     error.status = 403;
     return callback(error);
@@ -103,3 +103,4 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
 module.exports = app;
+
