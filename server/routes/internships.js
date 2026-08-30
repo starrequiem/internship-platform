@@ -29,8 +29,8 @@ router.get('/', async (req, res) => {
     const order = orderMap[sort] || orderMap.latest;
 
     const [rows] = await pool.query(
-      `SELECT i.*, u.username, u.school, u.avatar_url AS poster_avatar
-       FROM internships i JOIN users u ON i.poster_id = u.id
+      `SELECT i.*, COALESCE(u.username, '历史发布者') AS username, u.school, u.avatar_url AS poster_avatar
+       FROM internships i LEFT JOIN users u ON i.poster_id = u.id
        WHERE ${where.join(' AND ')}
        ORDER BY ${order}
        LIMIT ? OFFSET ?`,
@@ -96,8 +96,8 @@ router.get('/urgent/list', async (req, res) => {
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT i.*, u.username, u.school, u.major, u.avatar_url AS poster_avatar
-       FROM internships i JOIN users u ON i.poster_id = u.id
+      `SELECT i.*, COALESCE(u.username, '历史发布者') AS username, u.school, u.major, u.avatar_url AS poster_avatar
+       FROM internships i LEFT JOIN users u ON i.poster_id = u.id
        WHERE i.id = ?`, [req.params.id]
     );
     if (!rows.length) return res.status(404).json({ error: '岗位不存在' });
@@ -244,4 +244,5 @@ router.put('/:id/close', requireAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
 
