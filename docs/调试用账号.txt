@@ -28,9 +28,9 @@
 ───────────────────────────────────────
 数据库导入方式
 ───────────────────────────────────────
-  mysql -u root -p200619 internship_platform < schema-mysql.sql
-  mysql -u root -p200619 internship_platform < seed-data.sql
-  mysql -u root -p200619 internship_platform < alter-migration.sql
+  mysql -u root -p internship_platform < schema-mysql.sql
+  mysql -u root -p internship_platform < seed-data.sql
+  mysql -u root -p internship_platform < alter-migration.sql
 
 启动方式
 ───────────────────────────────────────

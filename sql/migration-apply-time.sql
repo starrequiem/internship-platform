@@ -1,6 +1,6 @@
 -- ============================================
 --  实习通 · 新增「投递时间」字段迁移
---  执行方式：mysql -u root -p200619 internship_platform < migration-apply-time.sql
+--  执行方式：mysql -u root -p internship_platform < migration-apply-time.sql
 -- ============================================
 
 USE internship_platform;

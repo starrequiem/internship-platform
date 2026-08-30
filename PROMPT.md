@@ -72,7 +72,7 @@ node maintenance/dedup.js --do        # 岗位去重（同 title+company+city）
 ## 数据库
 
 ```
-MySQL: localhost:3306 / internship_platform / root / 200619
+MySQL: localhost:3306 / internship_platform；凭据通过 DB_HOST、DB_USER、DB_PASSWORD 等环境变量提供
 表: users, internships, favorites, tags, internship_tags, thanks, reports
 迁移: sql/migration-v2.sql
 ```

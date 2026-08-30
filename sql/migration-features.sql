@@ -1,6 +1,6 @@
 -- ============================================
 --  实习通 · 新功能迁移（通知 + 投递）
---  执行方式：mysql -u root -p200619 internship_platform < migration-features.sql
+--  执行方式：mysql -u root -p internship_platform < migration-features.sql
 -- ============================================
 
 USE internship_platform;

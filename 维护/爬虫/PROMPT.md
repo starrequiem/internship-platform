@@ -44,7 +44,7 @@ python export_and_push.py --push
 MySQL: localhost:3306
 Database: internship_platform
 User: root
-Password: 200619
+Password: 通过 DB_PASSWORD 环境变量提供（不要写入文件）
 Charset: utf8mb4
 ```
 

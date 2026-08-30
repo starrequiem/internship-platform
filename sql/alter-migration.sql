@@ -1,6 +1,6 @@
 -- ============================================
 --  实习通 · 会员系统迁移脚本
---  执行方式：mysql -u root -p200619 internship_platform < alter-migration.sql
+--  执行方式：mysql -u root -p internship_platform < alter-migration.sql
 -- ============================================
 
 USE internship_platform;

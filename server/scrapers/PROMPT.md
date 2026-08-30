@@ -46,7 +46,7 @@ python segment_company.py   # 字节整页文本按「职位ID」边界分割入
 ## 数据库连接
 
 ```
-MySQL: localhost:3306 / internship_platform / root / 200619 / utf8mb4
+MySQL: localhost:3306 / internship_platform / utf8mb4；连接凭据由 DB_* 环境变量提供
 ```
 
 ## 牛客网URL规则

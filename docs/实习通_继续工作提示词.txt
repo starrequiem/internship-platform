@@ -7,7 +7,7 @@
 - Windows 11 / Node.js v24 / Python 3.x / MySQL 8.0
 - 后端：Node.js + Express（端口 3000）
 - 前端：Python HTTP Server（端口 8080）
-- 数据库：MySQL 8.0，库名 internship_platform，用户 root/200619
+- 数据库：MySQL 8.0，库名 internship_platform；连接凭据通过 DB_* 环境变量或 server/.env 提供
 
 ## 项目结构
 ```
@@ -27,7 +27,7 @@ internship-platform/
 ## 启动方式（推荐：双击 一键启动.bat）
 - 自动启 MySQL → 后端 → 前端 → 打开浏览器 http://localhost:8080
 - 手动：cd server && node app.js（后端） + python server.py（前端）
-- 数据库重建：mysql -u root -p200619 internship_platform < sql/schema-mysql.sql && mysql ... < sql/seed-data.sql
+- 数据库重建：mysql -u root -p internship_platform < sql/schema-mysql.sql，然后按需导入 sql/seed-data.sql（命令会交互式提示密码）
 
 ## 测试账号
 | 用户名 | 密码 | 角色 | 说明 |
@@ -97,7 +97,7 @@ internship-platform/
 ## 注意事项
 - 中文路径注意编码，curl 测试中文用文件方式：curl -d @file.json
 - 前端必须 http://localhost:8080，file:// 组件加载不了
-- 两个 JWT 密钥：internship-platform-secret（用户）/ internship-platform-admin-secret（管理员）
+- 两个 JWT 密钥：由 JWT_SECRET（用户）和 ADMIN_JWT_SECRET（管理员）环境变量提供，生产环境必须使用不同的随机长值
 - 管理员 token 也能调用用户接口（parseToken 依次尝试两个密钥）
 - api.js 已过滤 undefined/null/'' 参数，URLSearchParams 不会传 "undefined" 字符串
 - 列表接口已批量返回 tags，卡片渲染直接使用 item.tags
