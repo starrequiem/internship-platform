@@ -49,3 +49,21 @@
 - 桌面原仓库：`C:\Users\屠庭宇\Desktop\internship-platform`
 - 本次隔离工作克隆：`C:\Users\屠庭宇\.codex\visualizations\2026\08\29\01a04d8b-8340-7a72-a682-89cea1fa9a45\internship-platform-deploy`
 
+
+## 2026-08-30 Railway 上线与迁移记录
+
+### 已完成
+
+- Railway 应用与 MySQL 已部署，公网地址：`https://internship-platform-production-80c3.up.railway.app/`。
+- 已通过 Railway MySQL Console 导入业务数据（不含用户数据）：6776 条岗位、26 个标签、4953 条标签关联、4 条致谢。
+- 修复历史岗位因未导入原用户账户而被过滤的问题：岗位列表与详情使用左连接，缺失账户显示“历史发布者”。
+- 已导入仅含 `users` 表结构、不含任何用户记录的修复文件，解决线上岗位接口 500。
+- 已验证线上岗位接口返回 200、首页每页 6 条、总数 6776，分页数据正常。
+- CORS 许可修复已提交，用于解决注册验证码请求来源被拒绝的问题。
+
+### 待完成与安全清理
+
+- 完成注册、登录、详情、搜索、后台等完整线上回归测试。
+- 删除本机临时迁移文件 `migration-business-data.sql`、`users-schema.sql`（未加入 Git）。
+- 关闭 Railway MySQL Public Access，并删除仅为迁移创建的 Railway SSH 密钥。
+- 确认 CORS 修复提交已推送且 Railway 已部署。
