@@ -115,7 +115,11 @@ router.post('/captcha', async (req, res) => {
 
     console.log(`\n📱 [验证码] 用户名: ${username} | 验证码: ${code} | 10分钟内有效\n`);
 
-    res.json({ message: '验证码已生成（开发阶段请查看控制台输出）' });
+    const exposeCaptcha = process.env.EXPOSE_CAPTCHA === 'true';
+    res.json({
+      message: exposeCaptcha ? '验证码已生成（演示模式）' : '验证码已生成（请查看后端控制台输出）',
+      ...(exposeCaptcha ? { captcha: code } : {}),
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

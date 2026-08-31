@@ -261,8 +261,13 @@ async function getCaptcha() {
   var btn = document.getElementById('btnCaptcha');
   if (btn.disabled) return;
   try {
-    await UserAPI.captcha(username);
-    alert('验证码已生成（开发阶段请查看后端控制台输出）');
+    var result = await UserAPI.captcha(username);
+    if (result.captcha) {
+      document.getElementById('captcha').value = result.captcha;
+      alert('演示验证码：' + result.captcha + '（已自动填入）');
+    } else {
+      alert('验证码已生成，请查看后端控制台输出');
+    }
     btn.disabled = true; var sec = 60;
     captchaTimer = setInterval(function() {
       sec--; btn.textContent = sec + 's后重发';
