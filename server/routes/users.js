@@ -179,7 +179,7 @@ router.post('/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: '用户名或密码错误' });
 
     const token = jwt.sign(
-      { id: user.id, username: user.username },
+      { id: user.id, username: user.username, role: user.role },
       jwtSecret,
       { expiresIn: '7d' }
     );

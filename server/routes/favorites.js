@@ -8,10 +8,12 @@ router.post('/', requireAuth, async (req, res) => {
     const { internship_id } = req.body;
     if (!internship_id) return res.status(400).json({ error: '缺少 internship_id' });
 
-    await pool.query('INSERT IGNORE INTO favorites (user_id, internship_id) VALUES (?,?)',
+    const [result] = await pool.query('INSERT IGNORE INTO favorites (user_id, internship_id) VALUES (?,?)',
       [req.user.id, internship_id]);
-    await pool.query('UPDATE internships SET favorite_count = favorite_count + 1 WHERE id = ?',
-      [internship_id]);
+    if (result.affectedRows) {
+      await pool.query('UPDATE internships SET favorite_count = favorite_count + 1 WHERE id = ?',
+        [internship_id]);
+    }
     res.json({ message: '已收藏' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -24,10 +26,12 @@ router.delete('/', requireAuth, async (req, res) => {
     const { internship_id } = req.body;
     if (!internship_id) return res.status(400).json({ error: '缺少 internship_id' });
 
-    await pool.query('DELETE FROM favorites WHERE user_id = ? AND internship_id = ?',
+    const [result] = await pool.query('DELETE FROM favorites WHERE user_id = ? AND internship_id = ?',
       [req.user.id, internship_id]);
-    await pool.query('UPDATE internships SET favorite_count = GREATEST(favorite_count - 1, 0) WHERE id = ?',
-      [internship_id]);
+    if (result.affectedRows) {
+      await pool.query('UPDATE internships SET favorite_count = GREATEST(favorite_count - 1, 0) WHERE id = ?',
+        [internship_id]);
+    }
     res.json({ message: '已取消' });
   } catch (err) {
     res.status(500).json({ error: err.message });
