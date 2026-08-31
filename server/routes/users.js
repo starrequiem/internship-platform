@@ -61,9 +61,9 @@ router.get('/:id/favorites', async (req, res) => {
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     const [rows] = await pool.query(
-      `SELECT i.*, u.username, u.school FROM internships i
+      `SELECT i.*, COALESCE(u.username, '历史发布者') AS username, u.school FROM internships i
        JOIN favorites f ON i.id = f.internship_id
-       JOIN users u ON i.poster_id = u.id
+       LEFT JOIN users u ON i.poster_id = u.id
        WHERE f.user_id = ? ORDER BY f.created_at DESC
        LIMIT ? OFFSET ?`,
       [req.params.id, parseInt(limit), offset]
