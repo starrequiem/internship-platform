@@ -67,3 +67,22 @@
 - 删除本机临时迁移文件 `migration-business-data.sql`、`users-schema.sql`（未加入 Git）。
 - 关闭 Railway MySQL Public Access，并删除仅为迁移创建的 Railway SSH 密钥。
 - 确认 CORS 修复提交已推送且 Railway 已部署。
+
+## 2026-08-31 线上功能回归与数据库补表记录
+
+### 已完成
+
+- Railway 演示模式已开启：设置 `EXPOSE_CAPTCHA=true` 后，注册页会显示并自动填入验证码；正式上线前必须删除或设为 `false`。
+- 线上注册、登录、个人资料读取、收藏、反馈、投递记录、用户偏好、岗位订阅及通知接口均已回归验证。
+- 导入 `sql/production-schema.sql` 后补齐 `favorites`、`reports`、`applications` 等表；此前收藏和反馈因缺表失败的问题已解决。
+- 新增并导入 `sql/migration-missing-feature-tables.sql`，补齐 `notifications`、`subscriptions`、`user_tag_preferences` 三张功能表。
+- 修复收藏重复提交会错误累加/递减岗位收藏数的问题。
+- 修复收藏列表对历史岗位显示为空的问题：发布者缺失时显示“历史发布者”。
+- 修复通知、订阅、偏好标签路由未挂载导致的 404。
+
+### 当前测试数据与待办
+
+- 生产库保留专用 QA 用户 `qa_demo_1788193347`，以及其收藏、反馈、投递、偏好和订阅测试记录；清理前需确认。
+- 普通用户发布岗位会正确返回 403；管理员发布仍待验证。需在 Railway 应用服务 Console 执行 `cd /app/server && npm run db:init` 初始化管理员后继续。
+- 本机临时文件 `migration-business-data.sql`、`users-schema.sql` 仍未提交，确认后可删除。
+- 演示结束后关闭 `EXPOSE_CAPTCHA`，并关闭 MySQL Public Access、删除迁移用 SSH 密钥。
