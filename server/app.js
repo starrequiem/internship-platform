@@ -36,6 +36,9 @@ app.use('/api/tags', require('./routes/tags'));
 app.use('/api/applications', require('./routes/applications'));
 app.use('/api/thanks', require('./routes/thanks'));
 app.use('/api/reports', require('./routes/reports'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/subscriptions', require('./routes/subscriptions'));
+app.use('/api/users', require('./routes/preferences'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/upload', require('./routes/upload'));
 
