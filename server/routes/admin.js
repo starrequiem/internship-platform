@@ -187,7 +187,9 @@ router.get('/stats', adminAuth, async (req, res) => {
 router.get('/internships', adminAuth, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT i.*, u.username FROM internships i JOIN users u ON i.poster_id = u.id ORDER BY i.created_at DESC LIMIT 200`
+      `SELECT i.*, COALESCE(u.username, '历史发布者') AS username
+       FROM internships i LEFT JOIN users u ON i.poster_id = u.id
+       ORDER BY i.created_at DESC LIMIT 200`
     );
     res.json(rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
